@@ -26,15 +26,15 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarToggle">
           <div class="navbar-nav mr-auto">
-            <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
-            <a class="nav-item nav-link" id="42" href="{{ url_for('about') }}">About</a>
-            <a class="nav-item nav-link" href="https://tymotheus.github.io/">Turtle</a>
+            <a class="nav-item nav-link" href="{{ url_for('home') }}">Strona główna</a>
+            <a class="nav-item nav-link" id="42" href="{{ url_for('about') }}">O nas</a>
+            <a class="nav-item nav-link" href="https://tymotheus.github.io/">Żółwik</a>
           </div>
           <!-- Navbar Right Side -->
           <div class="navbar-nav">
             {% if current_user.is_authenticated %}
               <a class="nav-item nav-link" href="{{ url_for('new_post') }}">New Post</a>
-              <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
+              <a class="nav-item nav-link" href="{{ url_for('account') }}">Konto</a>
               <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
             {% else %}
               <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
@@ -63,21 +63,21 @@
 </div>
   <div class="col-md-4">
     <div class="content-section">
-      <h3>References</h3>
-      <p class='text-muted'>You can start your adventure anywhere below.
+      <h3>Przydatne linki</h3>
+      <p class='text-muted'>Zachęcamy do spojrzenia.
         <ul class="list-group">
-          <a href="https://en.wikipedia.org/wiki/Dune_(novel)">
-            <li class="list-group-item list-group-item-light href" >Dune novel</li></a>
-          <a href="https://en.wikipedia.org/wiki/Frank_Herbert">
-            <li class="list-group-item list-group-item-light href" >Frank Herbert</li></a>
-          <a href="https://open.spotify.com/album/5C6579KEvJj9AWaZtjSflC?si=WB8R13yvRPC3h14b8tiPyA">
-            <li class="list-group-item list-group-item-light href" >Toto soundtrack</li></a>
-          <a href="https://boardgamegeek.com/boardgame/283355/dune">
-            <li class="list-group-item list-group-item-light href" >Board game</li></a>
-          <a href="https://dune.fandom.com/wiki/Dune_Wiki">
-            <li class="list-group-item list-group-item-light href" >Dune fandom</li></a>
-          <a href="https://www.imdb.com/title/tt1160419/">
-            <li class="list-group-item list-group-item-light href" >Villeneuve movie</li></a>
+          <a href="https://www.credo.waw.pl/trumny-debowe-c-1.html">
+            <li class="list-group-item list-group-item-light href" >Trumny</li></a>
+          <a href="http://nagrobki-krakow.net.pl/">
+            <li class="list-group-item list-group-item-light href" >Nagrobki</li></a>
+          <a href="https://krematoriumklepsydra.pl/produkty/3/urny.html">
+            <li class="list-group-item list-group-item-light href" >Urny</li></a>
+          <a href="https://www.catholiccemeterieschicago.org/pl/Products_Services/Pricing">
+            <li class="list-group-item list-group-item-light href" >Krypty</li></a>
+            <a href="https://www.elblag.eu/">
+              <li class="list-group-item list-group-item-light href" >Urząd miejski w Elblągu</li></a>
+              <a href="https://grobonet.com/">
+                <li class="list-group-item list-group-item-light href" >Grobonet</li></a>
         </ul>
       </p>
     </div>
