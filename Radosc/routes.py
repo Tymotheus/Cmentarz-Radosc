@@ -3,7 +3,8 @@ import secrets
 from PIL import Image #for resizing uploaded images
 from flask import render_template, url_for, flash, redirect, request, abort
 from Radosc import app, db, bcrypt
-from Radosc.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
+from Radosc.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, \
+NieboszczykForm, KryptaForm, KostnicaForm, KrematoriumForm
 from Radosc.models import User, Post
 from flask_login import login_user, logout_user, current_user, login_required
 
@@ -29,15 +30,37 @@ def egg():
 @app.route("/dydej/")
 def hello():
     return jsonify({'name':'Antoni', 'surname':'Dydej'})
-#dump
-@app.route('/numbers/')
-def print_list():
-    return jsonify(list(range(5)))
 
-#dump
-@app.route('/teapot/')
-def teapot():
-    return "Would you like some tea?", 418
+@app.route('/nieboszczyk/', methods=['GET', 'POST'])
+def nieboszczyk():
+    form = NieboszczykForm()
+    if form.validate_on_submit():
+        flash(f'Twoje zgłoszenie zostało (prawie) odnotowane')
+    return render_template('nieboszczyk.html', title='Zaaplikuj', form=form)
+
+
+# Te 3 routy poniżej powinny być dostępne po zalogowaniu
+@app.route('/krypta/', methods=['GET', 'POST'])
+def krypta():
+    form = KryptaForm()
+    if form.validate_on_submit():
+        flash(f'Krypta została (prawie) dodana')
+    return render_template('krypta.html', title="Krypta", form=form)
+
+@app.route('/kostnica/', methods=['GET', 'POST'])
+def kostnica():
+    form = KostnicaForm()
+    if form.validate_on_submit():
+        flash(f'Kostnica została (prawie) dodana')
+    return render_template('kostnica.html', title="Kostnica", form=form)
+
+@app.route('/krematorium/', methods=['GET', 'POST'])
+def krematorium():
+    form = KrematoriumForm()
+    if form.validate_on_submit():
+        flash(f'Krematorium zostało (prawie) dodane', 'success')
+    return render_template('krematorium.html', title="Krematorium", form=form)
+
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():

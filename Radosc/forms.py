@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, \
+TextAreaField, DateField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from Radosc.models import User
 
@@ -26,6 +27,34 @@ class RegistrationForm(FlaskForm):
         if user:
             raise ValidationError('That email is taken. Please choose a different one.')
 
+# wprowadzanie dla rodziny klientów
+class NieboszczykForm(FlaskForm):
+    username = StringField('Imię i Nazwisko',
+                validators=[DataRequired(), Length(min=4)])
+    data_urodzenia = DateField('Data urodzenia', validators=[DataRequired()])
+    data_zgonu = DateField('Data zgonu', validators=[DataRequired()])
+    submit = SubmitField('Zarejestruj Nieboszczyka')
+    #TO ADD
+    #czy urna czy trumna?
+    #czy nagrobek czy krypta?
+    #coś z krematorium i kostnicą????
+
+#dodawanie nowych krypt
+class KryptaForm(FlaskForm):
+    nazwa_krypty = StringField('Nazwa krypty', validators=[DataRequired()])
+    pojemnosc = IntegerField('Pojemność', validators=[DataRequired()])
+    submit = SubmitField('Dodaj kryptę')
+    #data
+
+#dodawanie nowych kostnic
+class KostnicaForm(FlaskForm):
+    nazwa_kostnicy = StringField('Nazwa kostnicy', validators=[DataRequired()])
+    submit = SubmitField('Dodaj kostnicę')
+
+#dodawanie nowych krematoriów
+class KrematoriumForm(FlaskForm):
+    nazwa_krematorium = StringField('Nazwa krematorium', validators=[DataRequired()])
+    submit = SubmitField('Dodaj krematorium')
 
 class LoginForm(FlaskForm):
     email = StringField('Email',

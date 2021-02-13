@@ -28,7 +28,11 @@
           <div class="navbar-nav mr-auto">
             <a class="nav-item nav-link" href="{{ url_for('home') }}">Strona główna</a>
             <a class="nav-item nav-link" id="42" href="{{ url_for('about') }}">O nas</a>
-            <a class="nav-item nav-link" href="https://tymotheus.github.io/">Żółwik</a>
+            <a class="nav-item nav-link" href="{{url_for('nieboszczyk')}}">Zarejestruj nieboszczyka</a>
+            <a class="nav-item nav-link" href="{{url_for('krypta')}}">Dodaj kryptę</a>
+            <a class="nav-item nav-link" href="{{url_for('kostnica')}}">Dodaj kostnicę</a>
+            <a class="nav-item nav-link" href="{{url_for('krematorium')}}">Dodaj krematorium</a>
+
           </div>
           <!-- Navbar Right Side -->
           <div class="navbar-nav">
