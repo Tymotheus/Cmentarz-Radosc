@@ -5,7 +5,7 @@
     <form class="" action="" method="POST">
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Log In</legend>
+            <legend class="border-bottom mb-4">Zaloguj się</legend>
 
             <div class="form-group">
                 {{ form.email.label(class="form-control-label")}}
@@ -43,13 +43,13 @@
             {{ form.submit(class="btn btn-outline-info") }}
         </div>
         <small class="text-muted ml-2">
-          <a href="#">Forgot Password?</a>
+          <a href="#">Zapomniałeś hasła?</a>
         </small>
     </form>
   </div>
   <div class="border-top pt-3">
     <small class="text-muted">
-        Need an account? <a class="ml-2" href="{{ url_for('register') }}"> Sign Up</a>
+        Potrzebujesz konta? <a class="ml-2" href="{{ url_for('register') }}">Zarejestruj się</a>
     </small>
 
   </div>

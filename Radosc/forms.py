@@ -5,16 +5,17 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, \
 TextAreaField, DateField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from Radosc.models import User
+import datetime
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username',
+    username = StringField('Nazwa użytkownika',
                 validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                 validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm password',
+    password = PasswordField('Hasło', validators=[DataRequired()])
+    confirm_password = PasswordField('Potwierdź hasło',
                 validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Sign Up')
+    submit = SubmitField('Zarejestruj się')
 
     #checking if already exists
     def validate_username(self, username):
@@ -59,9 +60,9 @@ class KrematoriumForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = StringField('Email',
                 validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember Me')
-    submit = SubmitField('Login')
+    password = PasswordField('Hasło', validators=[DataRequired()])
+    remember = BooleanField('Pamiętaj mnie')
+    submit = SubmitField('Zaloguj')
 
 
 class UpdateAccountForm(FlaskForm):

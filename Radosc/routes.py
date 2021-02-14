@@ -5,11 +5,12 @@ from flask import render_template, url_for, flash, redirect, request, abort
 from Radosc import app, db, bcrypt
 from Radosc.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, \
 NieboszczykForm, KryptaForm, KostnicaForm, KrematoriumForm
+from Radosc.database import wstaw_krypte, wstaw_kostnice, wstaw_krematorium, wstaw_nieboszczyka
 from Radosc.models import User, Post
 from flask_login import login_user, logout_user, current_user, login_required
 
 from flask import jsonify
-
+import datetime
 
 @app.route("/")
 @app.route("/home")
@@ -35,7 +36,8 @@ def hello():
 def nieboszczyk():
     form = NieboszczykForm()
     if form.validate_on_submit():
-        flash(f'Twoje zgłoszenie zostało (prawie) odnotowane')
+        wstaw_nieboszczyka(form.username.data, form.data_urodzenia.data, form.data_zgonu.data)
+        flash(f'Twoje zgłoszenie zostało (prawie) odnotowane', 'success')
     return render_template('nieboszczyk.html', title='Zaaplikuj', form=form)
 
 
@@ -44,25 +46,29 @@ def nieboszczyk():
 def krypta():
     form = KryptaForm()
     if form.validate_on_submit():
-        flash(f'Krypta została (prawie) dodana')
+        #print(f"Nazwa: {form.nazwa_krypty.data} Pojemnosc: {form.pojemnosc.data}")
+        wstaw_krypte(form.nazwa_krypty.data, form.pojemnosc.data)
+        flash(f'Krypta została dodana', 'success')
     return render_template('krypta.html', title="Krypta", form=form)
 
 @app.route('/kostnica/', methods=['GET', 'POST'])
 def kostnica():
     form = KostnicaForm()
     if form.validate_on_submit():
-        flash(f'Kostnica została (prawie) dodana')
+        wstaw_kostnice(form.nazwa_kostnicy.data)
+        flash(f'Kostnica została (prawie) dodana', 'success')
     return render_template('kostnica.html', title="Kostnica", form=form)
 
 @app.route('/krematorium/', methods=['GET', 'POST'])
 def krematorium():
     form = KrematoriumForm()
     if form.validate_on_submit():
+        wstaw_krematorium(form.nazwa_krematorium.data)
         flash(f'Krematorium zostało (prawie) dodane', 'success')
     return render_template('krematorium.html', title="Krematorium", form=form)
 
 
-@app.route("/register", methods=['GET', 'POST'])
+@app.route("/register/", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -76,7 +82,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@app.route("/login", methods=['GET', 'POST'])
+@app.route("/login/", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -92,7 +98,7 @@ def login():
     return render_template('login.html', title='Login', form=form)
 
 
-@app.route("/logout")
+@app.route("/logout/")
 def logout():
     logout_user()
     return redirect(url_for('home'))
@@ -110,7 +116,7 @@ def save_picture(form_picture):
 
     return picture_fn
 
-@app.route("/account", methods=['GET', 'POST'])
+@app.route("/account/ ", methods=['GET', 'POST'])
 @login_required
 def account():
     form = UpdateAccountForm()
