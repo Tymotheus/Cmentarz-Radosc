@@ -1,4 +1,7 @@
 Note 13.02.2021:
+Forms are now valid also for the backend db side.
+
+Note 13.02.2021:
 Added valid forms on the frontend site.
 
 Note 10.02.2021:
