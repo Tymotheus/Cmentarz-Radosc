@@ -21,7 +21,7 @@
                     {{ form.nazwa_kostnicy(class="form-control form-control-lg")}}
                 {% endif %}
           </div>
-        
+
       </fieldset>
       <div class="form-group">
           {{ form.submit(class="btn btn-outline-info") }}
@@ -29,4 +29,17 @@
       </form>
 
     </div>
+    <article class="media content-section custom-subtitle">
+      <h2>Dostępne kostnice</h2>
+    </article>
+    {% for kostnica in kostnice %}
+    <article class="media content-section">
+      <div class="media-body">
+        <div class="article-metadata">
+          <small class="text-muted">ID {{ kostnica[0] }}</small>
+        </div>
+        <h2><a class="article-title" href="#">{{ kostnica[1] }}</a></h2>
+      </div>
+    </article>
+    {% endfor %}
 {% endblock content %}

@@ -27,6 +27,19 @@
           {{ form.submit(class="btn btn-outline-info") }}
       </div>
       </form>
-
     </div>
+
+    <article class="media content-section custom-subtitle">
+      <h2>Dostępne krematoria</h2>
+    </article>
+    {% for krematorium in krematoria %}
+    <article class="media content-section">
+      <div class="media-body">
+        <div class="article-metadata">
+          <small class="text-muted">ID {{ krematorium[0] }}</small>
+        </div>
+        <h2><a class="article-title" href="#">{{ krematorium[1] }}</a></h2>
+      </div>
+    </article>
+    {% endfor %}
 {% endblock content %}

@@ -18,6 +18,11 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 40px;
   width: 90%;
 }
+
+.custom-subtitle{
+  background-color: #efeff5!important
+}
+
 .bg-steel {
   background-color: #660066;
 }
@@ -64,7 +69,10 @@ a.article-title:hover {
 .article-metadata {
   padding-bottom: 1px;
   margin-bottom: 4px;
-  border-bottom: 1px solid #e3e3e3
+  border-bottom: 1px solid #e3e3e3;
+
+  display: flex;
+  justify-content: space-between;
 }
 
 .article-metadata a:hover {

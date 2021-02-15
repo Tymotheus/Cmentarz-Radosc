@@ -43,4 +43,19 @@
       </form>
 
     </div>
+    <article class="media content-section custom-subtitle">
+      <h2>Dostępne krypty</h2>
+    </article>
+    {% for krypta in krypty %}
+    <article class="media content-section">
+      <div class="media-body">
+        <div class="article-metadata">
+          <small class="text-muted">ID {{ krypta[0] }}</small>
+          <small class="text-muted mr-4">Wybudowano {{ krypta[4] }}  </small>
+        </div>
+        <h2><a class="article-title" href="#">{{ krypta[1] }}</a></h2>
+        <h4 class="article-content">Pojemność: {{ krypta[2]}}</h4>
+      </div>
+    </article>
+    {% endfor %}
 {% endblock content %}

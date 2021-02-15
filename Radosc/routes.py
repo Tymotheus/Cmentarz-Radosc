@@ -5,19 +5,21 @@ from flask import render_template, url_for, flash, redirect, request, abort
 from Radosc import app, db, bcrypt
 from Radosc.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, \
 NieboszczykForm, KryptaForm, KostnicaForm, KrematoriumForm
-from Radosc.database import wstaw_krypte, wstaw_kostnice, wstaw_krematorium, wstaw_nieboszczyka
+from Radosc.database import wstaw_krypte, wstaw_kostnice, wstaw_krematorium, wstaw_nieboszczyka, \
+pobierz_krypty, pobierz_kostnice, pobierz_krematoria, pobierz_nieboszczykow
 from Radosc.models import User, Post
 from flask_login import login_user, logout_user, current_user, login_required
 
 from flask import jsonify
 import datetime
 
-@app.route("/")
+
 @app.route("/home")
 def home():
     posts = Post.query.all()
     return render_template('home.html', posts=reversed(posts))
 
+@app.route("/")
 @app.route("/about")
 def about():
     return render_template('about.html', title='About')
@@ -34,38 +36,50 @@ def hello():
 
 @app.route('/nieboszczyk/', methods=['GET', 'POST'])
 def nieboszczyk():
+    nieboszczycy = pobierz_nieboszczykow()
+    print(nieboszczycy)
     form = NieboszczykForm()
     if form.validate_on_submit():
         wstaw_nieboszczyka(form.username.data, form.data_urodzenia.data, form.data_zgonu.data)
         flash(f'Twoje zgłoszenie zostało (prawie) odnotowane', 'success')
-    return render_template('nieboszczyk.html', title='Zaaplikuj', form=form)
+        nieboszczycy = pobierz_nieboszczykow()
+    return render_template('nieboszczyk.html', title='Zaaplikuj', form=form, nieboszczycy=nieboszczycy)
 
 
 # Te 3 routy poniżej powinny być dostępne po zalogowaniu
 @app.route('/krypta/', methods=['GET', 'POST'])
 def krypta():
+    krypty = pobierz_krypty()
+    print(krypty)
     form = KryptaForm()
     if form.validate_on_submit():
         #print(f"Nazwa: {form.nazwa_krypty.data} Pojemnosc: {form.pojemnosc.data}")
         wstaw_krypte(form.nazwa_krypty.data, form.pojemnosc.data)
         flash(f'Krypta została dodana', 'success')
-    return render_template('krypta.html', title="Krypta", form=form)
+        krypty = pobierz_krypty()
+    return render_template('krypta.html', title="Krypta", form=form, krypty=krypty)
 
 @app.route('/kostnica/', methods=['GET', 'POST'])
 def kostnica():
+    kostnice = pobierz_kostnice()
+    print(kostnice)
     form = KostnicaForm()
     if form.validate_on_submit():
         wstaw_kostnice(form.nazwa_kostnicy.data)
         flash(f'Kostnica została (prawie) dodana', 'success')
-    return render_template('kostnica.html', title="Kostnica", form=form)
+        kostnice = pobierz_kostnice()
+    return render_template('kostnica.html', title="Kostnica", form=form, kostnice=kostnice)
 
 @app.route('/krematorium/', methods=['GET', 'POST'])
 def krematorium():
+    krematoria = pobierz_krematoria()
+    print(krematoria)
     form = KrematoriumForm()
     if form.validate_on_submit():
         wstaw_krematorium(form.nazwa_krematorium.data)
         flash(f'Krematorium zostało (prawie) dodane', 'success')
-    return render_template('krematorium.html', title="Krematorium", form=form)
+        krematoria = pobierz_krematoria()
+    return render_template('krematorium.html', title="Krematorium", form=form, krematoria=krematoria)
 
 
 @app.route("/register/", methods=['GET', 'POST'])

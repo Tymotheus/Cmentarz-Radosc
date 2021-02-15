@@ -54,6 +54,21 @@
           {{ form.submit(class="btn btn-outline-info") }}
       </div>
       </form>
-
     </div>
+
+    <article class="media content-section custom-subtitle">
+      <h2>Nasi klienci</h2>
+    </article>
+    {% for nieboszczyk in nieboszczycy %}
+    <article class="media content-section">
+      <div class="media-body">
+        <div class="article-metadata">
+          <small class="text-muted">ID {{ nieboszczyk[0] }}</small>
+        </div>
+        <h2><a class="article-title" href="#">{{ nieboszczyk[1] }}</a></h2>
+        <p><b>Data urodzenia:</b> {{ nieboszczyk[2] }} <br>
+           <b>Data zgonu:</b> {{ nieboszczyk[3] }}</p>
+      </div>
+    </article>
+    {% endfor %}
 {% endblock content %}
