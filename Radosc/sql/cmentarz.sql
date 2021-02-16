@@ -262,6 +262,8 @@ FROM nieboszczycy inner join trumny on nieboszczycy.id_trumny = trumny.id
     inner join krypty on trumny.id_krypty=krypty.id
 WHERE krypty.nazwa = 'Krypta Odrodzenia';
 
+SELECT imie, trumna FROM Mieszkancy_Odrodzenia;
+
 -- Srednia wieku naszych klientow - ile sobie żyli
 CREATE VIEW srednia_wieku AS
     SELECT AVG( EXTRACT( YEAR FROM nieboszczycy.data_zgonu) - EXTRACT( YEAR FROM data_urodzenia))

@@ -81,6 +81,24 @@ def pobierz_sredni_wiek():
 def wyszukaj_nieboszczyka(imie):
     return f"SELECT * FROM nieboszczycy where imie=('{imie}')"
 
+
+#wyszukuje mieszkancow konkretnej krypty
+#korzystajac ze stworzonego wczesniej widoku
+@postgres_get
+def mieszkancy_odrodzenia():
+    return f"SELECT imie, trumna FROM Mieszkancy_Odrodzenia"
+
+#TO DO: Wykorzystuje tylko trumny a nie Urny!!!! ://// :((((()))))
+#wyszukuje wszystkich mieszkandcow krypty
+#ich: imie, daty urodzenia i smierci i material trumny
+#struktura wyniku: [(imie1, urodzenie1, zgon1, material1), (imie2, urodzenie2...)...]
+@postgres_get
+def mieszkancy_krypty(nazwa):
+    return f"SELECT nieboszczycy.imie, nieboszczycy.data_urodzenia, nieboszczycy.data_zgonu, trumny.material as Trumna \
+FROM nieboszczycy inner join trumny on nieboszczycy.id_trumny = trumny.id \
+    inner join krypty on trumny.id_krypty=krypty.id \
+WHERE krypty.nazwa = ('{nazwa}') "
+
 # wstawianie danych do bazki
 @postgres_send
 def wstaw_krypte(nazwa, pojemnosc):

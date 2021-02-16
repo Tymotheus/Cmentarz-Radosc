@@ -7,7 +7,7 @@ from Radosc.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostFor
 NieboszczykForm, KryptaForm, KostnicaForm, KrematoriumForm, WyszukajNieboszczykaForm
 from Radosc.database import wstaw_krypte, wstaw_kostnice, wstaw_krematorium, wstaw_nieboszczyka, \
 pobierz_krypty, pobierz_kostnice, pobierz_krematoria, pobierz_nieboszczykow, \
-pobierz_sredni_wiek, wyszukaj_nieboszczyka
+pobierz_sredni_wiek, wyszukaj_nieboszczyka, mieszkancy_odrodzenia, mieszkancy_krypty
 
 from Radosc.models import User, Post
 from flask_login import login_user, logout_user, current_user, login_required
@@ -53,10 +53,11 @@ def nieboszczyk():
     if wyszukaj_form.validate_on_submit():
         flash(f'Teraz powinienem szukać nieboszczyka....', 'success')
         search_result = wyszukaj_nieboszczyka(wyszukaj_form.imie.data)
+        search_result = search_result[0]
         print(search_result)
     return render_template('nieboszczyk.html', title='Zaaplikuj', form=form, \
         wyszukaj_form=wyszukaj_form, nieboszczycy=nieboszczycy, \
-        sredni_wiek=sredni_wiek, search_result=search_result[0])
+        sredni_wiek=sredni_wiek, search_result=search_result)
 
 
 # Te 3 routy poniżej powinny być dostępne po zalogowaniu
@@ -65,12 +66,20 @@ def krypta():
     krypty = pobierz_krypty()
     print(krypty)
     form = KryptaForm()
+    #UWAGA będę teraz robił skomplikowaną operację!
+    #Dla każdej krypty pobieram jej mieszkańców i zapisuję w zmiennej!
+    mieszkancy = [ mieszkancy_krypty(krypta[1]) for krypta in krypty]
+    print("Mieszkancy" + str(mieszkancy) )
+    testowanko = list(zip(krypty,mieszkancy))
+    print(testowanko)
     if form.validate_on_submit():
         #print(f"Nazwa: {form.nazwa_krypty.data} Pojemnosc: {form.pojemnosc.data}")
         wstaw_krypte(form.nazwa_krypty.data, form.pojemnosc.data)
         flash(f'Krypta została dodana', 'success')
         krypty = pobierz_krypty()
-    return render_template('krypta.html', title="Krypta", form=form, krypty=krypty)
+    return render_template('krypta.html', title="Krypta", form=form, \
+            krypty=krypty, mieszkancy=mieszkancy)
+
 
 @app.route('/kostnica/', methods=['GET', 'POST'])
 def kostnica():
@@ -83,6 +92,7 @@ def kostnica():
         flash(f'Kostnica została (prawie) dodana', 'success')
         kostnice = pobierz_kostnice()
     return render_template('kostnica.html', title="Kostnica", form=form, kostnice=kostnice)
+
 
 @app.route('/krematorium/', methods=['GET', 'POST'])
 def krematorium():
@@ -109,6 +119,7 @@ def register():
         flash(f'Your account has been created, you can log in now.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
 
 @app.route("/login/", methods=['GET', 'POST'])
 def login():
