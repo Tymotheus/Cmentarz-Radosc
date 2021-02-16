@@ -1,3 +1,6 @@
+Note 16.02.2021:
+I have added basic search by the name of the client.
+
 Note 15.02.2021:
 For my database I have now working form for posting new data
 and showing data downloaded from the db.
