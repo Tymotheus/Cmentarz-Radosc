@@ -57,13 +57,20 @@ class KrematoriumForm(FlaskForm):
     nazwa_krematorium = StringField('Nazwa krematorium', validators=[DataRequired()])
     submit = SubmitField('Dodaj krematorium')
 
+
+
+#wyszukiwanie nieboszczyków
+class WyszukajNieboszczykaForm(FlaskForm):
+    imie = StringField('Imię nieboszczyka', validators=[DataRequired()])
+    submit = SubmitField('Wyszukaj nieboszczyka')
+
+
 class LoginForm(FlaskForm):
     email = StringField('Email',
                 validators=[DataRequired(), Email()])
     password = PasswordField('Hasło', validators=[DataRequired()])
     remember = BooleanField('Pamiętaj mnie')
     submit = SubmitField('Zaloguj')
-
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username',

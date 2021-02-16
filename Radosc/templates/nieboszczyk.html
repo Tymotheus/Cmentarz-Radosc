@@ -56,8 +56,52 @@
       </form>
     </div>
 
-    <article class="media content-section custom-subtitle">
-      <h2>Nasi klienci</h2>
+<div class="content-section">
+  <form class="" action="" method="POST">
+    {{ wyszukaj_form.hidden_tag() }}
+    <fieldset class="form-group">
+        <legend class="border-bottom mb-4">Wyszukaj nieboszczyka</legend>
+        <div class="form-group">
+          {{ wyszukaj_form.imie.label(class="form-control-label") }}
+
+          {% if wyszukaj_form.imie.errors %}
+            {{ wyszukaj_form.imie(class="form-control form-control-lg is-invalid")}}
+            <div class="invalid-feedback">
+                {% for error in wyszukaj_form.imie.errors %}
+                  <span>{{ error}}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+                {{ wyszukaj_form.imie(class="form-control form-control-lg")}}
+            {% endif %}
+        </div>
+    </fieldset>
+    <div class="form-group">
+        {{ wyszukaj_form.submit(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div>
+<!-- Tutaj mamy wynik wyszukiwania nieboszczyków -->
+<article class="media content-section">
+  <div class="media-body">
+    {% if not search_result %}
+
+    {% else %}
+    <div class="article-metadata">
+      <small class="text-muted">ID {{ search_result[0] }}</small>
+    </div>
+    <h2><a class="article-title" href="#">{{ search_result[1] }}</a></h2>
+    <p><b>Data urodzenia:</b> {{ search_result[2] }} <br>
+       <b>Data zgonu:</b> {{ search_result[3] }}</p>
+    {% endif %}
+  </div>
+</article>
+
+    <article class="media content-section custom-subtitle" style="flex-direction: column">
+      <h2 class="article-title"> Nasi klienci</h2>
+      <div class="media body">
+        <h3>Średnia wieku naszych klientów to: {{ sredni_wiek[0][0] }} lat.</h3>
+      </div>
     </article>
     {% for nieboszczyk in nieboszczycy %}
     <article class="media content-section">

@@ -4,9 +4,11 @@ from PIL import Image #for resizing uploaded images
 from flask import render_template, url_for, flash, redirect, request, abort
 from Radosc import app, db, bcrypt
 from Radosc.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, \
-NieboszczykForm, KryptaForm, KostnicaForm, KrematoriumForm
+NieboszczykForm, KryptaForm, KostnicaForm, KrematoriumForm, WyszukajNieboszczykaForm
 from Radosc.database import wstaw_krypte, wstaw_kostnice, wstaw_krematorium, wstaw_nieboszczyka, \
-pobierz_krypty, pobierz_kostnice, pobierz_krematoria, pobierz_nieboszczykow
+pobierz_krypty, pobierz_kostnice, pobierz_krematoria, pobierz_nieboszczykow, \
+pobierz_sredni_wiek, wyszukaj_nieboszczyka
+
 from Radosc.models import User, Post
 from flask_login import login_user, logout_user, current_user, login_required
 
@@ -39,11 +41,22 @@ def nieboszczyk():
     nieboszczycy = pobierz_nieboszczykow()
     print(nieboszczycy)
     form = NieboszczykForm()
+    wyszukaj_form = WyszukajNieboszczykaForm()
+    sredni_wiek = pobierz_sredni_wiek()
+    search_result = ()
+    #formularz do wprowadzania nieboszczyków
     if form.validate_on_submit():
         wstaw_nieboszczyka(form.username.data, form.data_urodzenia.data, form.data_zgonu.data)
-        flash(f'Twoje zgłoszenie zostało (prawie) odnotowane', 'success')
+        flash(f'Twoje zgłoszenie zostało odnotowane', 'success')
         nieboszczycy = pobierz_nieboszczykow()
-    return render_template('nieboszczyk.html', title='Zaaplikuj', form=form, nieboszczycy=nieboszczycy)
+    #formularz do wyszukiwania nieboszczyków
+    if wyszukaj_form.validate_on_submit():
+        flash(f'Teraz powinienem szukać nieboszczyka....', 'success')
+        search_result = wyszukaj_nieboszczyka(wyszukaj_form.imie.data)
+        print(search_result)
+    return render_template('nieboszczyk.html', title='Zaaplikuj', form=form, \
+        wyszukaj_form=wyszukaj_form, nieboszczycy=nieboszczycy, \
+        sredni_wiek=sredni_wiek, search_result=search_result[0])
 
 
 # Te 3 routy poniżej powinny być dostępne po zalogowaniu
@@ -64,6 +77,7 @@ def kostnica():
     kostnice = pobierz_kostnice()
     print(kostnice)
     form = KostnicaForm()
+
     if form.validate_on_submit():
         wstaw_kostnice(form.nazwa_kostnicy.data)
         flash(f'Kostnica została (prawie) dodana', 'success')

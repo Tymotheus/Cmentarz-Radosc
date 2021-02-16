@@ -24,7 +24,7 @@ CREATE TYPE "material_urny" AS ENUM (
 );
 
 -- Tables
-DROP TABLE IF EXISTS nieboszczycy;
+DROP TABLE IF EXISTS nieboszczycy CASCADE;
 CREATE TABLE "nieboszczycy" (
   "id" SERIAL PRIMARY KEY,
   "imie" varchar,
@@ -117,9 +117,10 @@ ALTER TABLE "urny" ADD FOREIGN KEY ("id_krematorium") REFERENCES "krematoria" ("
 
 ALTER TABLE "trumny" ADD FOREIGN KEY ("id_kostnicy") REFERENCES "kostnice" ("id");
 
--- Dodawanie krypt
-insert into krypty (nazwa, pojemnosc) VALUES
-('Krypta Odrodzenia', 4);
+insert into krypty (nazwa, pojemnosc, wybudowano) VALUES
+('Krypta Odrodzenia', 4, '15.04.1452'),
+('Krypta św. Leonarda', 10, '25.12.1117');
+
 
 -- Dodawanie kostnic
 INSERT INTO kostnice (nazwa) VALUES
@@ -132,7 +133,10 @@ INSERT INTO krematoria (nazwa) VALUES
 INSERT INTO trumny (material, id_kostnicy) VALUES
 ('olcha', 1),
 ('sosna', 1),
-('dąb', 1);
+('dąb', 1),
+('dąb', 1),
+('sosna', 1),
+('olcha', 1)                                                 ;
 
 -- Dodawanie urn
 insert into urny (material, id_krematorium) VALUES
@@ -156,7 +160,8 @@ INSERT INTO nieboszczycy (imie, data_urodzenia, data_zgonu) VALUES
 ( 'Kazimierz Kuratowski', '2.02.1896', '18.06.1980'),
 ( 'Wacław Sierpiński', '14.03.1882', '21.10.1969') ,
 ( 'Marian Smoluchowski', '28.05.1872', '5.09.1917'),
-( 'Leopold Infeld', '20.08.1898', '15.01.1968');
+( 'Leopold Infeld', '20.08.1898', '15.01.1968'),
+( 'Aleksander Wolszczan', '29.04.1946', '10.11.2036')                                                                   ;
 
 -- Nadanie Banachowi odpowiedniej trumny
 -- Ustaw Banachowi pierwszą dębową trumnę
@@ -192,7 +197,7 @@ SET id_trumny = (
     from id_trumny
 )WHERE imie='Wacław Sierpiński';
 
--- -- Nadanie jego trumnie odpowiedniego nagrobka (takiej trumnie która trzyma Sierpińskiego)
+-- Nadanie jego trumnie odpowiedniego nagrobka (takiej trumnie która trzyma Sierpińskiego)
 update trumny
 set id_nagrobka = (
     with grobek as (
@@ -210,4 +215,60 @@ select nagrobki.* from nagrobki
     inner join nieboszczycy on nieboszczycy.id_trumny = trumny.id
 where nieboszczycy.imie='Wacław Sierpiński';
 
+-- Dodanie Smoluchowskiemu dębowej trumny
+update nieboszczycy
+set id_trumny = (
+    with id_trumny as (
+    select * from trumny where material = 'dąb' and id_krypty is null and id_nagrobka is null limit 1
+) select id from id_trumny
+) where imie='Marian Smoluchowski';
+
+-- Dodanie Infeldowi sosnowej trumny
+update nieboszczycy
+set id_trumny = (
+    with id_trumny as (
+    select * from trumny where material = 'sosna' and id_krypty is null and id_nagrobka is null limit 1
+) select id from id_trumny
+) where imie='Leopold Infeld';
+
+SELECT * FROM nieboszczycy left join trumny on nieboszczycy.id_trumny = trumny.id
+    left join nagrobki on nagrobki.id = trumny.id_nagrobka;
+
 SELECT * from nieboszczycy;
+
+
+-- Ok próbujemy zrobić ładny select do wyszukiwania nieboszczyków:
+SELECT * from nieboszczycy
+WHERE imie='Stefan Banach';
+
+
+-- Union - można połączyć tylko kolumny tego samego typu :/
+SELECT id, id_krypty from trumny
+UNION
+SELECT id, id_krypty from urny;
+
+-- Views
+
+-- Urodzeni po dacie - wyzwoleniu Krakowa spod okupacji
+CREATE VIEW Urodzeni_po_Wyzwoleniu AS
+SELECT imie, data_urodzenia, data_zgonu
+FROM nieboszczycy
+WHERE CAST(nieboszczycy.data_urodzenia AS Date) > '1945-01-18';
+
+-- Klienci z konkretnej krypty
+CREATE VIEW Mieszkancy_Odrodzenia AS
+SELECT krypty.nazwa, nieboszczycy.imie, nieboszczycy.data_urodzenia, nieboszczycy.data_zgonu, trumny.material as Trumna
+FROM nieboszczycy inner join trumny on nieboszczycy.id_trumny = trumny.id
+    inner join krypty on trumny.id_krypty=krypty.id
+WHERE krypty.nazwa = 'Krypta Odrodzenia';
+
+-- Srednia wieku naszych klientow - ile sobie żyli
+CREATE VIEW srednia_wieku AS
+    SELECT AVG( EXTRACT( YEAR FROM nieboszczycy.data_zgonu) - EXTRACT( YEAR FROM data_urodzenia))
+    FROM nieboszczycy;
+
+-- Pogrupowane trumien materiałami - i policzone
+CREATE VIEW materialy_trumien AS
+    SELECT trumny.material, count(*) AS Ilosc FROM nieboszczycy
+        inner join trumny on nieboszczycy.id_trumny = trumny.id
+        GROUP BY trumny.material;

@@ -55,7 +55,7 @@ def postgres_send(func):
                 print("PostgreSQL connection is closed")
     return wrapped_function
 
-# pobieramy dane z bazki
+# pobieranie danych z bazki
 @postgres_get
 def pobierz_krypty():
     return f"SELECT * FROM krypty"
@@ -72,7 +72,16 @@ def pobierz_kostnice():
 def pobierz_krematoria():
     return f"SELECT * FROM krematoria"
 
-# chce to wywolywać tak - wstaw_krypte(nazwa_z_formularza, pojemnosc_z_formularza)
+@postgres_get
+def pobierz_sredni_wiek():
+    return f"SELECT * FROM srednia_wieku"
+
+#wyszukuje konretnego nieboszczyka
+@postgres_get
+def wyszukaj_nieboszczyka(imie):
+    return f"SELECT * FROM nieboszczycy where imie=('{imie}')"
+
+# wstawianie danych do bazki
 @postgres_send
 def wstaw_krypte(nazwa, pojemnosc):
     return f"INSERT INTO krypty (nazwa, pojemnosc) VALUES ('{nazwa}', {pojemnosc})"

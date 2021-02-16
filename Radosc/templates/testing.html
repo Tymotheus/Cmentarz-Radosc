@@ -2,4 +2,13 @@
 
 {% block content %}
     <h1> Hell, it's about time! </h1>
+    <article class="media content-section custom-subtitle">
+      <h2>Tymek testuje queries</h2>
+    </article>
+    {% for q in query %}
+      {% for element in q %}
+        <p> {{element}} </p>
+      {% endfor %}
+      <br>
+    {% endfor %}
 {% endblock content %}
