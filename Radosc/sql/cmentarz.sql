@@ -223,6 +223,15 @@ set id_trumny = (
 ) select id from id_trumny
 ) where imie='Marian Smoluchowski';
 
+-- Dodanie Smoluchowskiego do odpowiedniej krypty
+update trumny
+set id_krypty = 1
+where id=(
+    SELECT id_trumny
+    from nieboszczycy
+    where imie = 'Wacław Sierpiński'
+);
+
 -- Dodanie Infeldowi sosnowej trumny
 update nieboszczycy
 set id_trumny = (
@@ -230,6 +239,15 @@ set id_trumny = (
     select * from trumny where material = 'sosna' and id_krypty is null and id_nagrobka is null limit 1
 ) select id from id_trumny
 ) where imie='Leopold Infeld';
+
+-- Dodanie Infelda do odpowiedniej krypty
+update trumny
+set id_krypty = 2
+where id=(
+    SELECT id_trumny
+    from nieboszczycy
+    where imie = 'Leopold Infeld'
+);
 
 SELECT * FROM nieboszczycy left join trumny on nieboszczycy.id_trumny = trumny.id
     left join nagrobki on nagrobki.id = trumny.id_nagrobka;

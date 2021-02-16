@@ -15,7 +15,6 @@ from flask_login import login_user, logout_user, current_user, login_required
 from flask import jsonify
 import datetime
 
-
 @app.route("/home")
 def home():
     posts = Post.query.all()
@@ -42,13 +41,15 @@ def nieboszczyk():
     print(nieboszczycy)
     form = NieboszczykForm()
     wyszukaj_form = WyszukajNieboszczykaForm()
-    sredni_wiek = pobierz_sredni_wiek()
+    sredni_wiek = round(pobierz_sredni_wiek()[0][0], 2)
     search_result = ()
     #formularz do wprowadzania nieboszczyków
     if form.validate_on_submit():
         wstaw_nieboszczyka(form.username.data, form.data_urodzenia.data, form.data_zgonu.data)
         flash(f'Twoje zgłoszenie zostało odnotowane', 'success')
         nieboszczycy = pobierz_nieboszczykow()
+        sredni_wiek = round(pobierz_sredni_wiek()[0][0], 2)
+
     #formularz do wyszukiwania nieboszczyków
     if wyszukaj_form.validate_on_submit():
         flash(f'Teraz powinienem szukać nieboszczyka....', 'success')
@@ -65,18 +66,23 @@ def nieboszczyk():
 def krypta():
     krypty = pobierz_krypty()
     print(krypty)
+    print()
     form = KryptaForm()
     #UWAGA będę teraz robił skomplikowaną operację!
     #Dla każdej krypty pobieram jej mieszkańców i zapisuję w zmiennej!
     mieszkancy = [ mieszkancy_krypty(krypta[1]) for krypta in krypty]
-    print("Mieszkancy" + str(mieszkancy) )
-    testowanko = list(zip(krypty,mieszkancy))
-    print(testowanko)
+    print("Zmienna mieszkancy: " + str(mieszkancy) )
+    print()
+    krypty = list(zip(krypty,mieszkancy))
     if form.validate_on_submit():
         #print(f"Nazwa: {form.nazwa_krypty.data} Pojemnosc: {form.pojemnosc.data}")
         wstaw_krypte(form.nazwa_krypty.data, form.pojemnosc.data)
         flash(f'Krypta została dodana', 'success')
         krypty = pobierz_krypty()
+        print("Przed referencją: " + str(krypty) )
+        mieszkancy = [ mieszkancy_krypty(krypta[1]) for krypta in krypty]
+        krypty = list(zip(krypty,mieszkancy))
+        print("Zmienna krypty: " + str(krypty) )
     return render_template('krypta.html', title="Krypta", form=form, \
             krypty=krypty, mieszkancy=mieszkancy)
 

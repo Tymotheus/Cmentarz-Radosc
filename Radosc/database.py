@@ -6,16 +6,16 @@ import datetime
 # The connection is opened for each query and then immediately closed
 def postgres_get(func):
     def wrapped_function(*args, **kwargs):
-        print("Inside a decorator")
-        print("I will establish the connection now")
+        # print("Inside a decorator")
+        # print("I will establish the connection now")
         try:
             connection = psycopg2.connect(user="postgres",
                                           password="postgres",
                                           host="localhost",
                                           port="5432",
                                           database="postgres")
-            print("Connection:")
-            print(connection)
+            # print("Connection:")
+            # print(connection)
             cursor = connection.cursor()
             cursor.execute(func(*args, **kwargs))
             connection.commit()
@@ -26,15 +26,15 @@ def postgres_get(func):
             if (connection):
                 cursor.close()
                 connection.close()
-                print("PostgreSQL connection is closed")
+                # print("PostgreSQL connection is closed")
             return result
     return wrapped_function
 
 
 def postgres_send(func):
     def wrapped_function(*args, **kwargs):
-        print("Inside a decorator")
-        print("I will establish the connection now")
+        # print("Inside a decorator")
+        # print("I will establish the connection now")
         try:
             connection = psycopg2.connect(user="postgres",
                                           password="postgres",
@@ -52,7 +52,7 @@ def postgres_send(func):
             if (connection):
                 cursor.close()
                 connection.close()
-                print("PostgreSQL connection is closed")
+                # print("PostgreSQL connection is closed")
     return wrapped_function
 
 # pobieranie danych z bazki

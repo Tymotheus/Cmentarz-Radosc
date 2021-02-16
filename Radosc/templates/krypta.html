@@ -50,24 +50,25 @@
     <article class="media content-section">
       <div class="media-body">
         <div class="article-metadata">
-          <small class="text-muted">ID {{ krypta[0] }}</small>
-          <small class="text-muted mr-4">Wybudowano {{ krypta[4] }}  </small>
+          <small class="text-muted">ID {{ krypta[0][0] }}</small>
+          <small class="text-muted mr-4">Wybudowano {{ krypta[0][4] }}  </small>
         </div>
-        <h2><a class="article-title" href="#">{{ krypta[1] }}</a></h2>
-        <h4 class="article-content">Pojemność: {{ krypta[2]}}</h4>
-        <div class="article-content">
-          {% if not mieszkancy %}
+        <h2><a class="article-title" href="#">{{ krypta[0][1] }}</a></h2>
+        <h4 class="article-content">Pojemność: {{ krypta[0][2]}}</h4>
+
+          {% if not krypta[1] %}
 
           {% else %}
-          {% for klient in mieszkancy %}
-          <h2><a class="article-title" href="#">{{ klient[0] }}</a></h2>
-          <p><b>Data urodzenia:</b> {{ klient[1] }} <br>
-             <b>Data zgonu:</b> {{ klient[2] }}
-             <b>Trumna:</b> {{ klient[3] }}</p>
-            {% endfor %}
+          <h4>Mieszkańcy:</h4>
+            {% for klient in krypta[1] %}
+              <p><b>Imię </b>{{ klient[0] }} <br>
+                 <b>Data urodzenia: </b> {{ klient[1] }} <br>
+                 <b>Data zgonu: </b> {{ klient[2] }} <br>
+                 <b>Trumna: </b> {{ klient[3] }}</p> <br>
+             {% endfor %}
           {% endif %}
         </div>
-      </div>
+    
     </article>
     {% endfor %}
 {% endblock content %}
