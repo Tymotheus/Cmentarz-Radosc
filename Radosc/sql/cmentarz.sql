@@ -75,7 +75,7 @@ CREATE TABLE "krypty" (
   "id" SERIAL PRIMARY KEY,
   "nazwa" varchar,
   "pojemnosc" int,
-  "liczba_trumien" int,
+  "liczba_trumien" int DEFAULT (0),
   "wybudowano" date DEFAULT (now())
 );
 
@@ -117,10 +117,31 @@ ALTER TABLE "urny" ADD FOREIGN KEY ("id_krematorium") REFERENCES "krematoria" ("
 
 ALTER TABLE "trumny" ADD FOREIGN KEY ("id_kostnicy") REFERENCES "kostnice" ("id");
 
+-- 2. Creating array triggers
+
+
+--
+-- CREATE TRIGGER krypta_trigger_1 AFTER INSERT ON nieboszczycy
+-- FOR EACH ROW EXECUTE PROCEDURE krypta1();
+--
+-- -- Jaki chcę zrobić trigger? Taki żeby inkrementował liczbę trumien w krypcie,
+-- -- za każdym razem jak odpowiednina trumna z truposzem jest do takiej wkładana!
+-- CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table$
+--     BEGIN
+--         UPDATE krypty
+--         SET liczba_trumien = liczba_trumien + 1
+--         WHERE id = new.id_trumny inner join
+--     END;
+--
+--     $example_table$ LANGUAGE plpgsql;
+
+-- 3. Seeding the database
+
+
+-- Dodawanie krypt
 insert into krypty (nazwa, pojemnosc, wybudowano) VALUES
 ('Krypta Odrodzenia', 4, '15.04.1452'),
 ('Krypta św. Leonarda', 10, '25.12.1117');
-
 
 -- Dodawanie kostnic
 INSERT INTO kostnice (nazwa) VALUES
