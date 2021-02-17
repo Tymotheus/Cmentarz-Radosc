@@ -52,9 +52,13 @@ def nieboszczyk():
 
     #formularz do wyszukiwania nieboszczyków
     if wyszukaj_form.validate_on_submit():
-        flash(f'Teraz powinienem szukać nieboszczyka....', 'success')
         search_result = wyszukaj_nieboszczyka(wyszukaj_form.imie.data)
-        search_result = search_result[0]
+
+        if search_result:
+            flash(f'Nieboszczyk znaleziony', 'success')
+            search_result = search_result[0]
+        else:
+            flash(f'Nieboszczyk nie został znaleziony', 'warning')
         print(search_result)
     return render_template('nieboszczyk.html', title='Zaaplikuj', form=form, \
         wyszukaj_form=wyszukaj_form, nieboszczycy=nieboszczycy, \

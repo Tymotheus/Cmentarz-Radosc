@@ -58,11 +58,11 @@ def postgres_send(func):
 # pobieranie danych z bazki
 @postgres_get
 def pobierz_krypty():
-    return f"SELECT * FROM krypty"
+    return f"SELECT * FROM krypty ORDER BY ID"
 
 @postgres_get
 def pobierz_nieboszczykow():
-    return f"SELECT * FROM nieboszczycy"
+    return f"SELECT * FROM nieboszczycy ORDER BY ID"
 
 @postgres_get
 def pobierz_kostnice():

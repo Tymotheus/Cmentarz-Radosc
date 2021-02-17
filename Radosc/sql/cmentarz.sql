@@ -119,24 +119,38 @@ ALTER TABLE "trumny" ADD FOREIGN KEY ("id_kostnicy") REFERENCES "kostnice" ("id"
 
 -- 2. Creating array triggers
 
+-- Trigger dbający o odpowiednie aktualizowanie liczby trumien w każdej krypcie
+-- Kiedy trumna jest dodawana do krypty - inkrementuje zmienną lczba_trumien
+-- Kiedy jest odejmowana - dekrementuje zmienną liczba_trumien
 
---
--- CREATE TRIGGER krypta_trigger_1 AFTER INSERT ON nieboszczycy
--- FOR EACH ROW EXECUTE PROCEDURE krypta1();
---
--- -- Jaki chcę zrobić trigger? Taki żeby inkrementował liczbę trumien w krypcie,
--- -- za każdym razem jak odpowiednina trumna z truposzem jest do takiej wkładana!
--- CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table$
---     BEGIN
---         UPDATE krypty
---         SET liczba_trumien = liczba_trumien + 1
---         WHERE id = new.id_trumny inner join
---     END;
---
---     $example_table$ LANGUAGE plpgsql;
+-- Note - I should also make sure that noone inserts too many trumnas
+-- into one krypta (we can not exceed its capacity)
+CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table$
+    BEGIN
+
+            UPDATE krypty
+            SET liczba_trumien = liczba_trumien + 1
+            WHERE id = NEW.id_krypty;
+            UPDATE krypty
+            SET liczba_trumien = liczba_trumien - 1
+            WHERE id = OLD.id_krypty;
+            RETURN NEW;
+    END;
+
+    $example_table$ LANGUAGE plpgsql;
+
+
+
+
+CREATE TRIGGER liczba_trumien
+    BEFORE UPDATE of id_krypty ON trumny
+    FOR EACH ROW
+    WHEN (OLD.id_krypty IS DISTINCT FROM NEW.id_krypty)
+    EXECUTE PROCEDURE krypta1();
+
+
 
 -- 3. Seeding the database
-
 
 -- Dodawanie krypt
 insert into krypty (nazwa, pojemnosc, wybudowano) VALUES
@@ -195,7 +209,7 @@ set id_trumny = (
 
 -- Nadanie jego trumnie odpowiedniej krypty 1 (takiej trumnie która trzyma Banacha)
 update trumny
-set id_krypty = 1
+set id_krypty = 2
 where id=(
     SELECT id_trumny
     from nieboszczycy
@@ -244,7 +258,7 @@ set id_trumny = (
 ) select id from id_trumny
 ) where imie='Marian Smoluchowski';
 
--- Dodanie Smoluchowskiego do odpowiedniej krypty
+-- Dodanie Sierpińskiego do odpowiedniej krypty
 update trumny
 set id_krypty = 1
 where id=(
@@ -274,7 +288,6 @@ SELECT * FROM nieboszczycy left join trumny on nieboszczycy.id_trumny = trumny.i
     left join nagrobki on nagrobki.id = trumny.id_nagrobka;
 
 SELECT * from nieboszczycy;
-
 
 -- Ok próbujemy zrobić ładny select do wyszukiwania nieboszczyków:
 SELECT * from nieboszczycy
@@ -313,3 +326,5 @@ CREATE VIEW materialy_trumien AS
     SELECT trumny.material, count(*) AS Ilosc FROM nieboszczycy
         inner join trumny on nieboszczycy.id_trumny = trumny.id
         GROUP BY trumny.material;
+
+SELECT * from nieboszczycy order by id;
