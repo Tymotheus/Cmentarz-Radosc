@@ -34,6 +34,7 @@ class NieboszczykForm(FlaskForm):
                 validators=[DataRequired(), Length(min=4)])
     data_urodzenia = DateField('Data urodzenia', validators=[DataRequired()])
     data_zgonu = DateField('Data zgonu', validators=[DataRequired()])
+
     submit = SubmitField('Zarejestruj Nieboszczyka')
     #TO ADD
     #czy urna czy trumna?
@@ -63,6 +64,8 @@ class KrematoriumForm(FlaskForm):
 class WyszukajNieboszczykaForm(FlaskForm):
     imie = StringField('Imię nieboszczyka', validators=[DataRequired()])
     submit = SubmitField('Wyszukaj nieboszczyka')
+    trumna = BooleanField('Trumna')
+    urna = BooleanField('Urna')
 
 
 class LoginForm(FlaskForm):

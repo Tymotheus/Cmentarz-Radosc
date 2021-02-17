@@ -7,7 +7,8 @@ from Radosc.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostFor
 NieboszczykForm, KryptaForm, KostnicaForm, KrematoriumForm, WyszukajNieboszczykaForm
 from Radosc.database import wstaw_krypte, wstaw_kostnice, wstaw_krematorium, wstaw_nieboszczyka, \
 pobierz_krypty, pobierz_kostnice, pobierz_krematoria, pobierz_nieboszczykow, \
-pobierz_sredni_wiek, wyszukaj_nieboszczyka, mieszkancy_odrodzenia, mieszkancy_krypty
+pobierz_sredni_wiek, wyszukaj_nieboszczyka, mieszkancy_odrodzenia, mieszkancy_krypty, \
+set_admin_role, set_client_role
 
 from Radosc.models import User, Post
 from flask_login import login_user, logout_user, current_user, login_required
@@ -138,12 +139,14 @@ def register():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
+        set_admin_role()
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
+            set_admin_role()
             return redirect(next_page) if next_page else redirect(url_for('about'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger ')
@@ -153,6 +156,7 @@ def login():
 @app.route("/logout/")
 def logout():
     logout_user()
+    set_client_role()
     return redirect(url_for('about'))
 
 def save_picture(form_picture):

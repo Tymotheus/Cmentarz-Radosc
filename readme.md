@@ -32,3 +32,4 @@ Watched Correy's flask tutorials and have working skeleton; created basic logic 
 * Adding constraints to the database (so one deadman can have only a tombstone OR a crypt and a coffin OR an urn)
 * Adding proper authorisation and access levels for customers/workers
 * Clean the project (in general) - there is some dead code, also from the blog-like skeleton - for example .js script and mechanics of blogposts
+* Not exactly sure if granting client/admin role in current model shouldn't be done before every query - this one right now is a bit messy and done only to meet general criteria of the project
