@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h1>  </h1>
+
+    {% if current_user.is_authenticated %}
     <div class="content-section">
       <form class="" action="" method="POST">
         {{ form.hidden_tag() }}
@@ -43,6 +44,7 @@
       </form>
 
     </div>
+    {% endif %}
     <article class="media content-section custom-subtitle">
       <h2>Dostępne krypty</h2>
     </article>

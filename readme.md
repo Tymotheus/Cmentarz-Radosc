@@ -31,3 +31,4 @@ Watched Correy's flask tutorials and have working skeleton; created basic logic 
 * Adding appropriate feedback when the searched deadman does not exist (error/warning prompt)
 * Adding constraints to the database (so one deadman can have only a tombstone OR a crypt and a coffin OR an urn)
 * Adding proper authorisation and access levels for customers/workers
+* Clean the project (in general) - there is some dead code, also from the blog-like skeleton - for example .js script and mechanics of blogposts
