@@ -1,3 +1,6 @@
+Note 17.02.2021:
+Added a lot. Pretty much. Additional tables and triggers and backend validation.
+
 Note 16.02.2021:
 I have added basic search by the name of the client.
 
@@ -12,15 +15,19 @@ Note 13.02.2021:
 Added valid forms on the frontend site.
 
 Note 10.02.2021:
-To start/create the base we need to use function db.create_all() (after importing db from Radosc)
+Watched Correy's flask tutorials and have working skeleton; created basic logic and ERD diagram.
 
-Projekt na Bazy Danych 1
+<h2>Databases 1 course project </h2>
 
-Stack: Flask
-Bazka: PostgreSQL
-Łączenie pythona z Postgresem - paczka psycopg2
+* <b>Frontend:</b> HTML + Bootstrap
+* <b>Backend:</b> Python & Flask
+* <b>Database:</b> PostgreSQL
+* <b>Python + Postgres connection:</b> psycopg2 package
 
 
-Development:
-Rewriting postgres decorators in database.py
-Making one universal decorator instead of the current two.
+<h3>Further development:</h3>
+
+* Rewriting postgres decorators in database.py. Making 1 universal decorator instead of the current 2.
+* Adding appropriate feedback when the searched deadman does not exist (error/warning prompt)
+* Adding constraints to the database (so one deadman can have only a tombstone OR a crypt and a coffin OR an urn)
+* Adding proper authorisation and access levels for customers/workers
