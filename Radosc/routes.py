@@ -45,7 +45,10 @@ def nieboszczyk():
     search_result = ()
     #formularz do wprowadzania nieboszczyków
     if form.validate_on_submit():
-        wstaw_nieboszczyka(form.username.data, form.data_urodzenia.data, form.data_zgonu.data)
+        # TODO: Make some frontend validation here!!!
+        print('**************************************************************')
+        print(wstaw_nieboszczyka(form.username.data, form.data_urodzenia.data, form.data_zgonu.data))
+        print('**************************************************************')
         flash(f'Twoje zgłoszenie zostało odnotowane', 'success')
         nieboszczycy = pobierz_nieboszczykow()
         sredni_wiek = round(pobierz_sredni_wiek()[0][0], 2)

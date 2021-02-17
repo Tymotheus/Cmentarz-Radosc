@@ -27,9 +27,9 @@ CREATE TYPE "material_urny" AS ENUM (
 DROP TABLE IF EXISTS nieboszczycy CASCADE;
 CREATE TABLE "nieboszczycy" (
   "id" SERIAL PRIMARY KEY,
-  "imie" varchar,
-  "data_urodzenia" date,
-  "data_zgonu" date,
+  "imie" varchar NOT NULL,
+  "data_urodzenia" date NOT NULL,
+  "data_zgonu" date NOT NULL,
   "id_trumny" int,
   "id_urny" int
 );
@@ -37,72 +37,90 @@ CREATE TABLE "nieboszczycy" (
 DROP TABLE IF EXISTS trumny CASCADE ;
 CREATE TABLE "trumny" (
   "id" SERIAL PRIMARY KEY,
-  "material" material_trumny,
+  "material" material_trumny NOT NULL,
   "id_nagrobka" int,
   "id_krypty" int,
-  "id_kostnicy" int
+  "id_kostnicy" int NOT NULL
 );
 
 DROP TABLE IF EXISTS nagrobki;
 CREATE TABLE "nagrobki" (
   "id" SERIAL PRIMARY KEY,
-  "material" material_nagrobka,
+  "material" material_nagrobka NOT NULL,
   "imie" varchar
 );
 
-DROP TABLE IF EXISTS kostnice;
+DROP TABLE IF EXISTS kostnice CASCADE ;
 CREATE TABLE "kostnice" (
   "id" SERIAL PRIMARY KEY,
-  "nazwa" varchar
+  "nazwa" varchar NOT NULL
 );
 
-DROP TABLE IF EXISTS urny;
+DROP TABLE IF EXISTS urny CASCADE ;
 CREATE TABLE "urny" (
   "id" SERIAL PRIMARY KEY,
-  "material" material_urny,
+  "material" material_urny NOT NULL,
   "id_krypty" int,
-  "id_krematorium" int
+  "id_krematorium" int NOT NULL
 );
 
-DROP TABLE IF EXISTS krematoria;
+DROP TABLE IF EXISTS krematoria CASCADE ;
 CREATE TABLE "krematoria" (
   "id" SERIAL PRIMARY KEY,
-  "nazwa" varchar
+  "nazwa" varchar NOT NULL
 );
 
-DROP TABLE IF EXISTS krypty;
+DROP TABLE IF EXISTS krypty CASCADE ;
 CREATE TABLE "krypty" (
   "id" SERIAL PRIMARY KEY,
-  "nazwa" varchar,
-  "pojemnosc" int,
+  "nazwa" varchar NOT NULL,
+  "pojemnosc" int NOT NULL,
   "liczba_trumien" int DEFAULT (0),
   "wybudowano" date DEFAULT (now())
 );
 
-DROP TABLE IF EXISTS pracownicy;
-CREATE TABLE "pracownicy" (
-  "id" SERIAL PRIMARY KEY
-);
 
-DROP TABLE IF EXISTS grabarze;
-CREATE TABLE "grabarze" (
-  "id" SERIAL PRIMARY KEY
-);
-
-DROP TABLE IF EXISTS sprzatacze;
+DROP TABLE IF EXISTS sprzatacze CASCADE;
 CREATE TABLE "sprzatacze" (
-  "id" SERIAL PRIMARY KEY
+  "id" SERIAL PRIMARY KEY,
+  "imie" VARCHAR NOT NULL
 );
 
-DROP TABLE IF EXISTS prac_administracyjni;
-CREATE TABLE "prac_administracyjni" (
-  "id" SERIAL PRIMARY KEY
+DROP TABLE IF EXISTS trumniarze CASCADE ;
+CREATE TABLE "trumniarze"(
+    "id" SERIAL PRIMARY KEY,
+    "imie" VARCHAR NOT NULL
 );
 
-DROP TABLE IF EXISTS biura;
-CREATE TABLE "biura" (
-  "id" SERIAL PRIMARY KEY
+DROP TABLE IF EXISTS urniarze CASCADE ;
+CREATE TABLE "urniarze"(
+    "id" SERIAL PRIMARY KEY,
+    "imie" VARCHAR NOT NULL
 );
+
+DROP TABLE IF EXISTS sprzatanie_krypt;
+CREATE TABLE "sprzatanie_krypt"(
+    "id_sprzatacza" INT,
+    "id_krypty" INT,
+    "data" date DEFAULT (now())
+);
+
+DROP TABLE IF EXISTS wykonywanie_trumien;
+CREATE TABLE "wykonywanie_trumien"(
+    "id_trumniarza" INT,
+    "id_trumny" INT,
+    "data" date DEFAULT (now())
+
+);
+
+DROP TABLE IF EXISTS wykonywanie_urn;
+CREATE TABLE "wykonywanie_urn"(
+    "id_urniarza" INT,
+    "id_urny" INT,
+    "data" date DEFAULT (now())
+
+);
+
 
 -- Relationships
 ALTER TABLE "nieboszczycy" ADD FOREIGN KEY ("id_trumny") REFERENCES "trumny" ("id");
@@ -113,9 +131,23 @@ ALTER TABLE "trumny" ADD FOREIGN KEY ("id_nagrobka") REFERENCES "nagrobki" ("id"
 
 ALTER TABLE "trumny" ADD FOREIGN KEY ("id_krypty") REFERENCES "krypty" ("id");
 
+ALTER TABLE "urny" ADD FOREIGN KEY ("id_krypty") REFERENCES "krypty" ("id");
+
 ALTER TABLE "urny" ADD FOREIGN KEY ("id_krematorium") REFERENCES "krematoria" ("id");
 
 ALTER TABLE "trumny" ADD FOREIGN KEY ("id_kostnicy") REFERENCES "kostnice" ("id");
+
+-- Relacje many to many dla tablic asocjacyjnych
+ALTER TABLE "sprzatanie_krypt" ADD FOREIGN KEY  ("id_krypty") REFERENCES "krypty" ("id");
+ALTER TABLE "sprzatanie_krypt" ADD FOREIGN KEY  ("id_sprzatacza") REFERENCES "sprzatacze" ("id");
+
+ALTER TABLE "wykonywanie_trumien" ADD FOREIGN KEY ("id_trumny") REFERENCES "trumny" ("id");
+ALTER TABLE "wykonywanie_trumien" ADD FOREIGN KEY ("id_trumniarza") REFERENCES "trumniarze" ("id");
+
+ALTER TABLE "wykonywanie_urn" ADD FOREIGN KEY ("id_urny") REFERENCES "urny" ("id");
+ALTER TABLE "wykonywanie_urn" ADD FOREIGN KEY ("id_urniarza") REFERENCES "urniarze" ("id");
+
+
 
 -- 2. Creating array triggers
 
@@ -126,8 +158,13 @@ ALTER TABLE "trumny" ADD FOREIGN KEY ("id_kostnicy") REFERENCES "kostnice" ("id"
 -- Note - I should also make sure that noone inserts too many trumnas
 -- into one krypta (we can not exceed its capacity)
 CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table$
+    DECLARE
+        _liczba_trumien INTEGER = (Select liczba_trumien from krypty where id=NEW.id_krypty);
+        _pojemnosc INTEGER = (SELECT pojemnosc from krypty where id=NEW.id_krypty);
     BEGIN
-
+        IF (_liczba_trumien >= _pojemnosc) THEN
+            RAISE exception 'Ta krypta jest już pełna';
+        ELSE
             UPDATE krypty
             SET liczba_trumien = liczba_trumien + 1
             WHERE id = NEW.id_krypty;
@@ -135,18 +172,30 @@ CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table$
             SET liczba_trumien = liczba_trumien - 1
             WHERE id = OLD.id_krypty;
             RETURN NEW;
-    END;
-
+        END IF;
+    END
     $example_table$ LANGUAGE plpgsql;
 
 
 
-
-CREATE TRIGGER liczba_trumien
+CREATE TRIGGER zaktualizuj_liczbe_trumien
     BEFORE UPDATE of id_krypty ON trumny
     FOR EACH ROW
     WHEN (OLD.id_krypty IS DISTINCT FROM NEW.id_krypty)
     EXECUTE PROCEDURE krypta1();
+
+
+CREATE OR REPLACE FUNCTION nieboszczyk1() RETURNS TRIGGER AS $nieboszczykowy1$
+    BEGIN
+        RAISE exception 'Przepraszamy, nie akceptujemy nieumarłych!';
+    END;
+    $nieboszczykowy1$ LANGUAGE plpgsql;
+
+CREATE TRIGGER sprawdz_nieboszczyka_na_insert
+    BEFORE INSERT ON nieboszczycy
+    FOR EACH ROW
+    WHEN (NEW.data_urodzenia > NEW.data_zgonu)
+    EXECUTE PROCEDURE nieboszczyk1();
 
 
 
@@ -155,15 +204,20 @@ CREATE TRIGGER liczba_trumien
 -- Dodawanie krypt
 insert into krypty (nazwa, pojemnosc, wybudowano) VALUES
 ('Krypta Odrodzenia', 4, '15.04.1452'),
-('Krypta św. Leonarda', 10, '25.12.1117');
+('Krypta św. Leonarda', 10, '25.12.1117'),
+('Krypta 101', 13, '14.09.2011'),
+('Krypta Norymberska', 5, '2.08.1928');
 
 -- Dodawanie kostnic
 INSERT INTO kostnice (nazwa) VALUES
-('Casablanca');
+('Casablanca'),
+('Trypolis');
 
 -- Dodawanie krematoriów
 INSERT INTO krematoria (nazwa) VALUES
-('Jordan');
+('Jordan'),
+('Ganges');
+
 -- Dodawanie trumien
 INSERT INTO trumny (material, id_kostnicy) VALUES
 ('olcha', 1),
@@ -171,14 +225,18 @@ INSERT INTO trumny (material, id_kostnicy) VALUES
 ('dąb', 1),
 ('dąb', 1),
 ('sosna', 1),
-('olcha', 1)                                                 ;
+('olcha', 1),
+('olcha', 1),
+('sosna', 1);
 
 -- Dodawanie urn
 insert into urny (material, id_krematorium) VALUES
 ('mosiądz', 1),
 ('drewno', 1),
-('kamień', 1);
-
+('kamień', 1),
+('metal', 1),
+('szkło', 1),
+('mosiądz', 1);
 
 -- Dodawanie nagrobków
 INSERT INTO nagrobki (material) VALUES
@@ -197,6 +255,54 @@ INSERT INTO nieboszczycy (imie, data_urodzenia, data_zgonu) VALUES
 ( 'Marian Smoluchowski', '28.05.1872', '5.09.1917'),
 ( 'Leopold Infeld', '20.08.1898', '15.01.1968'),
 ( 'Aleksander Wolszczan', '29.04.1946', '10.11.2036')                                                                   ;
+
+-- Dodawanie trumniarzy
+INSERT INTO trumniarze (imie) VALUES
+('Maciej Podbioł'),
+('Gabriel Podbioł');
+
+-- Dodawanie urniarzy
+INSERT INTO urniarze (imie) VALUES
+('Piotr Kubica'),
+('Ksenia Kwiatkowska');
+
+-- Dodawanie sprzątaczy
+INSERT INTO sprzatacze (imie) VALUES
+('Franiszek Wietrzykostki'),
+('Rita Wietrzykostka');
+
+-- Dodawanie informacji o sprzątaniu krypt
+INSERT INTO sprzatanie_krypt (id_sprzatacza, id_krypty) VALUES
+(1,1),
+(1,2),
+(1,3),
+(2,2),
+(2,3),
+(2,4);
+
+-- Dodawanie informacji o wykonywaniu trumien
+INSERT INTO wykonywanie_trumien (id_trumniarza, id_trumny) VALUES
+(1,1),
+(1,2),
+(1,3),
+(1,4),
+(2,3),
+(2,4),
+(2,5),
+(2,6),
+(2,7),
+(2,8);
+
+-- Dodawanie informacji o wykonywaninu urn
+INSERT INTO wykonywanie_urn (id_urniarza, id_urny) VALUES
+(1,1),
+(1,2),
+(1,3),
+(1,4),
+(2,3),
+(2,4),
+(2,5),
+(2,6);
 
 -- Nadanie Banachowi odpowiedniej trumny
 -- Ustaw Banachowi pierwszą dębową trumnę
@@ -283,6 +389,50 @@ where id=(
     from nieboszczycy
     where imie = 'Leopold Infeld'
 );
+
+-- Dodanie Steinhausowi sosnowej trumny
+update nieboszczycy
+set id_trumny = (
+    with id_trumny as (
+    select
+           * from trumny where material = 'olcha' and id_krypty is null and id_nagrobka is null limit 1
+) select id from id_trumny
+) where imie='Hugo Steinhaus';
+
+-- Dodanie Steinhausa do odpowiedniej krypty
+update trumny
+set id_krypty = 3
+where id=(
+    SELECT id_trumny
+    from nieboszczycy
+    where imie = 'Hugo Steinhaus'
+);
+
+-- Dodanie Steinhausowi sosnowej trumny
+update nieboszczycy
+set id_trumny = (
+    with id_trumny as (
+    select
+           * from trumny where material = 'sosna' and id_krypty is null and id_nagrobka is null limit 1
+) select id from id_trumny
+) where imie='Kazimierz Kuratowski';
+
+-- Dodanie Steinhausa do odpowiedniej krypty
+update trumny
+set id_krypty = 4
+where id=(
+    SELECT id_trumny
+    from nieboszczycy
+    where imie = 'Kazimierz Kuratowski'
+);
+
+-- -- Nadanie Wolszczanowi odpowiedniej urny
+UPDATE nieboszczycy
+SET id_urny=2
+WHERE imie = 'Aleksander Wolszczan';
+
+
+
 
 SELECT * FROM nieboszczycy left join trumny on nieboszczycy.id_trumny = trumny.id
     left join nagrobki on nagrobki.id = trumny.id_nagrobka;
