@@ -1,5 +1,5 @@
 -- 1. Initiating the database
--- Enums
+-- Enums for materials
 DROP TYPE IF EXISTS material_nagrobka CASCADE ;
 CREATE TYPE "material_nagrobka" AS ENUM (
   'granit',
@@ -23,7 +23,19 @@ CREATE TYPE "material_urny" AS ENUM (
   'szkło'
 );
 
+-- Enums for roles
+CREATE TYPE "role_type" AS ENUM(
+    'admin',
+    'klient'
+);
+
 -- Tables
+CREATE TABLE "users"(
+    "id" SERIAL PRIMARY KEY,
+    "role" role_type DEFAULT 'klient', --Dostęp do wszystkich funkcjonalności tylko dla admina
+    "imie" varchar
+);
+
 DROP TABLE IF EXISTS nieboszczycy CASCADE;
 CREATE TABLE "nieboszczycy" (
   "id" SERIAL PRIMARY KEY,
@@ -197,9 +209,13 @@ CREATE TRIGGER sprawdz_nieboszczyka_na_insert
     WHEN (NEW.data_urodzenia > NEW.data_zgonu)
     EXECUTE PROCEDURE nieboszczyk1();
 
-
-
 -- 3. Seeding the database
+
+-- Dodawanie userów
+INSERT INTO users (role, imie)
+VALUES
+    ('klient', 'Nowy Klient'),
+    ('admin', 'Admin');
 
 -- Dodawanie krypt
 insert into krypty (nazwa, pojemnosc, wybudowano) VALUES
