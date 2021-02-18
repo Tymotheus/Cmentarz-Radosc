@@ -1,5 +1,6 @@
--- Views
+-- 3. Creating the views
 
+-- Views
 -- Urodzeni po dacie - wyzwoleniu Krakowa spod okupacji
 CREATE OR REPLACE VIEW Urodzeni_po_Wyzwoleniu AS
 SELECT imie, data_urodzenia, data_zgonu

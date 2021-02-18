@@ -1,4 +1,4 @@
--- 3. Seeding the database
+-- 4. Seeding the database
 
 -- Dodawanie krypt
 insert into krypty (nazwa, pojemnosc, wybudowano) VALUES
@@ -34,7 +34,6 @@ INSERT INTO trumny (material, id_kostnicy) VALUES
 ('sosna', 1),
 ('sosna', 1),
 ('sosna', 1);
-
 
 -- Dodawanie urn
 insert into urny (material, id_krematorium) VALUES
@@ -128,7 +127,7 @@ set id_trumny = (
     select id from pierwsza
 ) where imie='Stefan Banach';
 
--- Nadanie jego trumnie odpowiedniej krypty 1 (takiej trumnie która trzyma Banacha)
+-- Nadanie jego trumnie odpowiedniej krypty o id 2 (takiej trumnie która trzyma Banacha)
 update trumny
 set id_krypty = 2
 where id=(
@@ -137,11 +136,18 @@ where id=(
     where imie = 'Stefan Banach'
 );
 
--- -- Nadanie Ulamowi odpowiedniej urny
+-- -- Nadanie Ulamowi odpowiedniej urny o id=1
 UPDATE nieboszczycy
 SET id_urny=1
 WHERE imie = 'Stanisław Ulam';
 
+UPDATE urny
+SET id_krypty=4
+where id=(
+    SELECT id_urny
+    from nieboszczycy
+    where imie = 'Stanisław Ulam'
+);
 --Dodanie Borsukowi odpowiedniej trumny - pierwszej olszanej
 UPDATE nieboszczycy
 SET id_trumny = (
@@ -154,7 +160,6 @@ SET id_trumny = (
     )
 WHERE imie='Karol Borsuk';
 
-
 --Dodanie Sierpińskiemu odpowiedniej trumny - pierwszej olszanej
 UPDATE nieboszczycy
 SET id_trumny = (
@@ -165,8 +170,6 @@ SET id_trumny = (
         limit 1)
     select id from pierwsza
 )WHERE imie='Wacław Sierpiński';
-
-select * from trumny where (material = 'olcha' and id_krypty is null and id_nagrobka is null) limit 1;
 
 -- Nadanie jego trumnie odpowiedniego nagrobka (takiej trumnie która trzyma Sierpińskiego)
 update trumny
@@ -192,7 +195,6 @@ SET id_trumny = (
 )WHERE imie='Stanisław Mazur';
 
 
-
 -- Dodanie Smoluchowskiemu dębowej trumny
 update nieboszczycy
 set id_trumny = (
@@ -215,6 +217,7 @@ set id_trumny = (
         limit 1)
     select id from pierwsza
 ) where imie='Leopold Infeld';
+
 
 -- Dodanie Infelda do odpowiedniej krypty
 update trumny
@@ -269,9 +272,3 @@ where id=(
 UPDATE nieboszczycy
 SET id_urny=2
 WHERE imie = 'Aleksander Wolszczan';
-
-INSERT into trumniarze(imie) VALUES
-('Jan z Kolna');
-
-INSERT into trumny(material, id_kostnicy) VALUES
-('olcha', 1);

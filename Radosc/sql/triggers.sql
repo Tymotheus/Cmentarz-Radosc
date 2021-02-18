@@ -1,4 +1,3 @@
-
 -- 2. Creating array triggers
 
 -- Trigger dbający o odpowiednie aktualizowanie liczby trumien w każdej krypcie

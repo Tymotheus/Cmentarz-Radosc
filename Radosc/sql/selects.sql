@@ -1,14 +1,17 @@
--- Pierwsza dębowa trumna, która nie ma przypisanej krypty i nagrobka - wybiera tylko jedną, pierwszą
--- UWAGA!!! może wziąć trumnę z nieboszczykiem w środku :///
-select * from trumny where material = 'dąb' and id_krypty is null and id_nagrobka is null limit 1;
+-- Select do wyszukiwania nieboszczyków po imieniu
+SELECT * from nieboszczycy
+WHERE imie='Stefan Banach';
 
+-- Pierwsza dębowa trumna, która nie ma przypisanej krypty i nagrobka - wybiera tylko jedną, pierwszą
+-- !Może wziąć trumnę z nieboszczykiem w środku !
+select * from trumny
+where material = 'dąb' and id_krypty is null and id_nagrobka is null limit 1;
 
 -- Pierwsza dębowa trumna wolna bez nikogo w środku
 SELECT * from trumny left join nieboszczycy n on trumny.id = n.id_trumny
 WHERE material = 'dąb' and n.id is null
 group by trumny.id, n.id
 limit 1;
-
 
 -- Wszystkie nagrobki które mają pod sobą trumnę z nieboszczykiem
 SELECT nagrobki.id, nagrobki.material, nagrobki.imie
@@ -37,3 +40,8 @@ SELECT trumny.* from trumny left join nieboszczycy n on trumny.id = n.id_trumny
 -- Nieboszczycy bez trumien (i urn!) :/
 SELECT * from nieboszczycy
 WHERE id_trumny is null and id_urny is null;
+
+-- Union - można połączyć tylko kolumny tego samego typu
+SELECT id, id_krypty from trumny
+UNION
+SELECT id, id_krypty from urny;

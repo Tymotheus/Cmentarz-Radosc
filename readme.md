@@ -1,28 +1,50 @@
-Note 17.02.2021:
+<h2>Databases 1 project </h2>
+<h4>For AGH UST university classes </h4>
+
+
+* <b>Frontend:</b> HTML + Bootstrap
+* <b>Backend:</b> Python & Flask 🐍
+* <b>Database:</b> PostgreSQL
+* <b>Python + Postgres connection:</b> psycopg2 package
+
+<h3>Notes</h3>
+
+<b>Running app notes:</b>
+Before running the app, a proper database should be created. Scripts for it should be run in the following order.
+<ol>
+<li> creates.sql</li>
+<li> triggers.sql</li>
+<li> views.sql</li>
+<li> inserts.sql</li>
+</ol>
+
+After that you just need to run app.py script using command:
+```python
+python app.py
+```
+<b>Notes:</b>
+* Script 5, roles.sql preferably should not be run. It is redundant and was added only to meet
+the requirements of the project for the roles.
+* Another requirement was to make the app and all its functions in Polish language - I might rewrite it to English one day.
+
+<b>Note 17.02.2021:</b>
 Added a lot. Pretty much. Additional tables and triggers and backend validation.
 
-Note 16.02.2021:
+<b>Note 16.02.2021:</b>
 I have added basic search by the name of the client.
 
-Note 15.02.2021:
+<b>Note 15.02.2021:</b>
 For my database I have now working form for posting new data
 and showing data downloaded from the db.
 
-Note 14.02.2021:
+<b>Note 14.02.2021:</b>
 Forms are now valid also for the backend db side.
 
-Note 13.02.2021:
+<b>Note 13.02.2021:</b>
 Added valid forms on the frontend site.
 
-Note 10.02.2021:
+<b>Note 10.02.2021:</b>
 Watched Correy's flask tutorials and have working skeleton; created basic logic and ERD diagram.
-
-<h2>Databases 1 course project </h2>
-
-* <b>Frontend:</b> HTML + Bootstrap
-* <b>Backend:</b> Python & Flask
-* <b>Database:</b> PostgreSQL
-* <b>Python + Postgres connection:</b> psycopg2 package
 
 
 <h3>Further development:</h3>
