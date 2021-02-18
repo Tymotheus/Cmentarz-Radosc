@@ -29,6 +29,7 @@ Watched Correy's flask tutorials and have working skeleton; created basic logic 
 
 * Rewriting postgres decorators in database.py. Making 1 universal decorator instead of the current 2.
 * Adding appropriate feedback when the searched deadman does not exist (error/warning prompt)
+* In general fixing prompts that user receives - they can be confusing rn
 * Adding constraints to the database (so one deadman can have only a tombstone OR a crypt and a coffin OR an urn)
 * Adding proper authorisation and access levels for customers/workers
 * Clean the project (in general) - there is some dead code, also from the blog-like skeleton - for example .js script and mechanics of blogposts

@@ -1,34 +1,35 @@
 import os
 import secrets
+import datetime
 from PIL import Image #for resizing uploaded images
 from flask import render_template, url_for, flash, redirect, request, abort
+from flask import jsonify
+from flask_login import login_user, logout_user, current_user, login_required
+
 from Radosc import app, db, bcrypt
 from Radosc.forms import *
 from Radosc.database import *
-
-
 from Radosc.models import User, Post
-from flask_login import login_user, logout_user, current_user, login_required
 
-from flask import jsonify
-import datetime
 
 @app.route("/home")
 def home():
     posts = Post.query.all()
     return render_template('home.html', posts=reversed(posts))
 
+
 @app.route("/")
 @app.route("/about")
 def about():
     return render_template('about.html', title='About')
 
+
 @app.route('/nieboszczyk/', methods=['GET', 'POST'])
 def nieboszczyk():
     nieboszczycy = pobierz_nieboszczykow()
+    nieprzypisani_nieboszczycy = pobierz_nieprzypisanych_nieboszczykow()
     print("Nieboszczycy:")
     print(nieboszczycy)
-    nieprzypisani_nieboszczycy = pobierz_nieprzypisanych_nieboszczykow()
     print("Nieprzypisani nieboszczycy:")
     print(nieprzypisani_nieboszczycy)
     form = NieboszczykForm()
@@ -37,17 +38,13 @@ def nieboszczyk():
     search_result = ()
     #formularz do wprowadzania nieboszczyków
     if form.validate_on_submit():
-        # TODO: Make some frontend validation here!!!
-        print('**************************************************************')
+        # TODO: Make some frontend validation here
         print(wstaw_nieboszczyka(form.username.data, form.data_urodzenia.data, form.data_zgonu.data))
-        print('**************************************************************')
         flash(f'Twoje zgłoszenie zostało odnotowane', 'success')
         return redirect(url_for('nieboszczyk'))
-
     #formularz do wyszukiwania nieboszczyków
     if wyszukaj_form.validate_on_submit():
         search_result = wyszukaj_nieboszczyka(wyszukaj_form.imie.data)
-
         if search_result:
             flash(f'Nieboszczyk znaleziony', 'success')
             search_result = search_result[0]
@@ -60,13 +57,13 @@ def nieboszczyk():
         nieprzypisani_nieboszczycy=nieprzypisani_nieboszczycy)
 
 
-# Te 3 routy poniżej powinny być dostępne po zalogowaniu
 @app.route('/krypta/', methods=['GET', 'POST'])
 def krypta():
     krypty = pobierz_krypty()
     print(krypty)
     print()
     form = KryptaForm()
+    #TO DO: this one below probably needs refactoring and polishing
     #UWAGA będę teraz robił skomplikowaną operację!
     #Dla każdej krypty pobieram jej mieszkańców i zapisuję w zmiennej!
     mieszkancy_trumny = [ mieszkancy_krypty_trumny(krypta[1]) for krypta in krypty]
@@ -77,13 +74,12 @@ def krypta():
     krypty = list(zip(krypty,mieszkancy_trumny, mieszkancy_urny))
     print("Zmienna krypty: " + str(krypty))
     if form.validate_on_submit():
-        #print(f"Nazwa: {form.nazwa_krypty.data} Pojemnosc: {form.pojemnosc.data}")
         wstaw_krypte(form.nazwa_krypty.data, form.pojemnosc.data)
         flash(f'Krypta została dodana', 'success')
         return redirect(url_for('krypta'))
-
     return render_template('krypta.html', title="Krypta", form=form, \
             krypty=krypty)
+
 
 @app.route('/nagrobek/', methods=['GET', 'POST'])
 def nagrobek():
@@ -97,22 +93,20 @@ def nagrobek():
     if form.validate_on_submit():
         dodaj_nagrobek(form.material.data)
         return redirect(url_for('nagrobek'))
-
     return render_template('nagrobek.html', title='Nagrobek', \
         form=form,\
         zajete_nagrobki=zajete_nagrobki, nieprzypisane_nagrobki=nieprzypisane_nagrobki )
+
 
 @app.route('/kostnica/', methods=['GET', 'POST'])
 def kostnica():
     kostnice = pobierz_kostnice()
     print(kostnice)
     form = KostnicaForm()
-
     if form.validate_on_submit():
         wstaw_kostnice(form.nazwa_kostnicy.data)
-        flash(f'Kostnica została (prawie) dodana', 'success')
+        flash(f'Kostnica została dodana', 'success')
         return redirect(url_for('kostnica'))
-
     return render_template('kostnica.html', title="Kostnica", form=form, kostnice=kostnice)
 
 
@@ -123,10 +117,12 @@ def krematorium():
     form = KrematoriumForm()
     if form.validate_on_submit():
         wstaw_krematorium(form.nazwa_krematorium.data)
-        flash(f'Krematorium zostało (prawie) dodane', 'success')
+        flash(f'Krematorium zostało dodane', 'success')
         return redirect(url_for('krematorium'))
     return render_template('krematorium.html', title="Krematorium", form=form, krematoria=krematoria)
 
+
+#Below are the routes that you need to be logged in to get access to
 @app.route('/trumna/', methods=['GET', 'POST'])
 @login_required
 def trumna():
@@ -141,15 +137,12 @@ def trumna():
     form_nowa_trumna = DodajTrumneForm()
     if form_nieboszczyk.validate_on_submit():
         przypisz_nieboszczyka_do_trumny(form_nieboszczyk.id_nieboszczyka.data, form_nieboszczyk.id_trumny.data )
-        flash(f'Trumna została (chyba? Może?) dodana do nieboszczyka', 'success')
         return redirect(url_for('trumna'))
     elif form_krypta.validate_on_submit():
         przypisz_trumnie_krypte(form_krypta.id_trumny.data, form_krypta.id_krypty.data )
-        flash(f'Trumna została (chyba? Może?) dodana do krypty', 'success')
         return redirect(url_for('trumna'))
     elif form_nagrobek.validate_on_submit():
         przypisz_trumnie_nagrobek(form_nagrobek.id_trumny.data, form_nagrobek.id_nagrobka.data )
-        flash(f'Trumna została (chyba? Może?) dodana do nagrobka', 'success')
         return redirect(url_for('trumna'))
     elif form_nowa_trumna.validate_on_submit():
         dodaj_trumne(form_nowa_trumna.material.data, form_nowa_trumna.id_kostnicy.data)
@@ -158,6 +151,7 @@ def trumna():
      form_nagrobek =form_nagrobek, form_nieboszczyk=form_nieboszczyk, \
      form_nowa_trumna=form_nowa_trumna,
      trumny=trumny, puste_trumny=puste_trumny)
+
 
 @app.route('/urna/', methods=['GET', 'POST'])
 @login_required
@@ -172,20 +166,17 @@ def urna():
     form_nowa_urna = DodajUrneForm()
     if form_krypta.validate_on_submit():
         przypisz_urnie_krypte(form_krypta.id_urny.data, form_krypta.id_krypty.data )
-        flash(f'Urna została (chyba? Może?) dodana do krypty', 'success')
         return redirect(url_for('urna'))
-
-    if form_nieboszczyk.validate_on_submit():
+    elif form_nieboszczyk.validate_on_submit():
         przypisz_nieboszczyka_do_urny(form_nieboszczyk.id_nieboszczyka.data, form_nieboszczyk.id_urny.data )
-        flash(f'Urna została (chyba? Może?) dodana do nieboszczyka', 'success')
         return redirect(url_for('urna'))
-
-    if form_nowa_urna.validate_on_submit():
+    elif form_nowa_urna.validate_on_submit():
         dodaj_urne(form_nowa_urna.material.data, form_nowa_urna.id_krematorium.data)
         return redirect(url_for('urna'))
     return render_template('urna.html', title="Urny", form_krypta=form_krypta,\
     form_nieboszczyk=form_nieboszczyk, urny=urny, puste_urny=puste_urny,
     form_nowa_urna=form_nowa_urna)
+
 
 @app.route('/pracownik/', methods=['GET', 'POST'])
 @login_required
@@ -251,18 +242,18 @@ def logout():
     set_client_role()
     return redirect(url_for('about'))
 
+
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename) #Underscore is for the variable we dont use
     picture_fn = random_hex + f_ext
     picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
-
     output_size = (125, 125)
     i = Image.open(form_picture)
     i.thumbnail(output_size) #resizing the image
     i.save(picture_path)
-
     return picture_fn
+
 
 @app.route("/account/ ", methods=['GET', 'POST'])
 @login_required
@@ -278,7 +269,6 @@ def account():
         flash('Your account has been updated!', 'success')
         return redirect(url_for('account'))
     elif request.method == 'GET':
-
         form.username.data = current_user.username
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)

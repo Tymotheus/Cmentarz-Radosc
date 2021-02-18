@@ -1,13 +1,13 @@
 from datetime import datetime
 from Radosc import db, login_manager
-from flask_login import UserMixin #dont know why???
+from flask_login import UserMixin
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-#oh yeah explosion! Here we got, bye bye old SQL :P
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
