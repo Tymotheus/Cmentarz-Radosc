@@ -28,7 +28,7 @@ CREATE OR REPLACE VIEW materialy_trumien AS
         GROUP BY trumny.material;
 
 
--- Wszystkie trumny nieprzypisane nigdzie z trupkiem w środku
+-- Wszystkie trumny nieprzypisane nigdzie z nieboszczykiem w środku
 CREATE OR REPLACE VIEW nieprzypisane_trumny AS
     SELECT trumny.id, trumny.material, n.imie FROM trumny
         inner join nieboszczycy n on trumny.id = n.id_trumny

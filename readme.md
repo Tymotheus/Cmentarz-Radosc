@@ -33,6 +33,7 @@ the requirements of the project for the roles.
 
 <b>Note 18.02.2021:</b>
 <b>Note concerning the deploy</b>
+Deployed the app and have fully working version.
 I was deploying the base to ElephantSQL. I came across the following problem:
 I had to rewrite inserts, more precisely the date to other format:
 FROM '30.04.1892' TO '1892-04-30'

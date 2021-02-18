@@ -1,13 +1,7 @@
 -- 2. Creating array triggers
 
--- Trigger dbający o odpowiednie aktualizowanie liczby trumien w każdej krypcie
--- Kiedy trumna jest dodawana do krypty - inkrementuje zmienną lczba_trumien
--- Kiedy jest odejmowana - dekrementuje zmienną liczba_trumien
 
--- Note - I should also make sure that noone inserts too many trumnas
--- into one krypta (we can not exceed its capacity)
-
--- Funkcja dbająca o zlicznie trumn
+-- Funkcja dbająca o zlicznie trumien
 CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table_1$
     DECLARE
         _liczba_trumien INTEGER = (Select liczba_trumien from krypty where id=NEW.id_krypty);
