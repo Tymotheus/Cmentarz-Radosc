@@ -72,7 +72,13 @@ def pobierz_krypty():
 
 @postgres_get
 def pobierz_nieboszczykow():
-    return f"SELECT * FROM nieboszczycy ORDER BY ID"
+    return f"""SELECT * FROM nieboszczycy
+                WHERE id_urny is not null OR id_trumny is not null
+                ORDER BY ID"""
+
+@postgres_get
+def pobierz_nieprzypisanych_nieboszczykow():
+    return f"SELECT * from nieboszczycy WHERE id_trumny is null and id_urny is null"
 
 @postgres_get
 def pobierz_kostnice():
@@ -87,12 +93,31 @@ def pobierz_sredni_wiek():
     return f"SELECT * FROM srednia_wieku"
 
 @postgres_get
+def pobierz_zajete_nagrobki():
+    return f"""SELECT nagrobki.id, nagrobki.material, nagrobki.imie \
+                FROM nagrobki  \
+                inner join trumny on nagrobki.id = trumny.id_nagrobka \
+                inner join nieboszczycy on nieboszczycy.id_trumny = trumny.id"""
+
+@postgres_get
 def pobierz_nieprzypisane_trumny():
     return f"SELECT * FROM nieprzypisane_trumny"
 
 @postgres_get
 def pobierz_nieprzypisane_urny():
     return f"SELECT * FROM nieprzypisane_urny"
+
+@postgres_get
+def pobierz_nieprzypisane_nagrobki():
+    return f"SELECT * FROM nagrobki WHERE imie is null"
+
+@postgres_get
+def pobierz_puste_trumny():
+    return "SELECT * FROM puste_trumny"
+
+@postgres_get
+def pobierz_puste_urny():
+    return "SELECT * FROM puste_urny"
 
 #wyszukuje konretnego nieboszczyka
 @postgres_get
@@ -106,18 +131,17 @@ def wyszukaj_nieboszczyka(imie):
 def mieszkancy_odrodzenia():
     return f"SELECT imie, trumna FROM Mieszkancy_Odrodzenia"
 
-#TO DO: Wykorzystuje tylko trumny a nie Urny!!!! ://// :((((()))))
-#wyszukuje wszystkich mieszkandcow krypty
+
+#zwraca wszystkich mieszkancow danej krypty mieszkajacych w trumnach
 #ich: imie, daty urodzenia i smierci i material trumny
 #struktura wyniku: [(imie1, urodzenie1, zgon1, material1), (imie2, urodzenie2...)...]
 
-#zwraca wszystkich mieszkancow danej krypty mieszkajacych w trumnach
 @postgres_get
 def mieszkancy_krypty_trumny(nazwa):
     return f"SELECT nieboszczycy.imie, nieboszczycy.data_urodzenia, nieboszczycy.data_zgonu, trumny.material as Trumna \
-FROM nieboszczycy inner join trumny on nieboszczycy.id_trumny = trumny.id \
-    inner join krypty on trumny.id_krypty=krypty.id \
-WHERE krypty.nazwa = ('{nazwa}') "
+        FROM nieboszczycy inner join trumny on nieboszczycy.id_trumny = trumny.id \
+        inner join krypty on trumny.id_krypty=krypty.id \
+        WHERE krypty.nazwa = ('{nazwa}') "
 
 #zwraca wszystkich mieszkancow danej krypty mieszkajacych w urnach
 @postgres_get
@@ -157,5 +181,24 @@ def przypisz_trumnie_krypte(id_trumny, id_krypty):
     return f"UPDATE trumny SET id_krypty=('{id_krypty}') WHERE id=('{id_trumny }')"
 
 @postgres_send
+def przypisz_trumnie_nagrobek(id_trumny, id_nagrobka):
+    return f"UPDATE trumny SET id_nagrobka=('{id_nagrobka}') WHERE id=('{id_trumny }')"
+
+@postgres_send
 def przypisz_urnie_krypte(id_urny, id_krypty):
     return f"UPDATE urny SET id_krypty=('{id_krypty}') WHERE id=('{id_urny }')"
+
+
+@postgres_send
+def przypisz_nieboszczyka_do_trumny(id_nieboszczyka, id_trumny):
+    return f"""UPDATE nieboszczycy
+                SET id_trumny = {id_trumny}
+                WHERE nieboszczycy.id = ({id_nieboszczyka})
+                """
+
+@postgres_send
+def przypisz_nieboszczyka_do_urny(id_nieboszczyka, id_urny):
+    return f"""UPDATE nieboszczycy
+                SET id_urny = {id_urny}
+                WHERE nieboszczycy.id = ({id_nieboszczyka})
+                """
