@@ -16,12 +16,32 @@ WHERE krypty.nazwa = 'Krypta Odrodzenia';
 SELECT imie, trumna FROM Mieszkancy_Odrodzenia;
 
 -- Srednia wieku naszych klientow - ile sobie żyli
-CREATE VIEW srednia_wieku AS
+CREATE OR REPLACE VIEW srednia_wieku AS
     SELECT AVG( EXTRACT( YEAR FROM nieboszczycy.data_zgonu) - EXTRACT( YEAR FROM data_urodzenia))
     FROM nieboszczycy;
 
 -- Pogrupowane trumien materiałami - i policzone
-CREATE VIEW materialy_trumien AS
+CREATE OR REPLACE VIEW materialy_trumien AS
     SELECT trumny.material, count(*) AS Ilosc FROM nieboszczycy
         inner join trumny on nieboszczycy.id_trumny = trumny.id
         GROUP BY trumny.material;
+
+
+-- Wszystkie trumny nieprzypisane nigdzie z trupkiem w środku
+DROP VIEW nieprzypisane_trumny;
+CREATE OR REPLACE VIEW nieprzypisane_trumny AS
+    SELECT trumny.id, trumny.material, n.imie FROM trumny
+        inner join nieboszczycy n on trumny.id = n.id_trumny
+        WHERE trumny.id_krypty is null and trumny.id_nagrobka is null
+    Group By trumny.id, n.imie;
+
+DROP VIEW nieprzypisane_urny;
+CREATE OR REPLACE VIEW nieprzypisane_urny AS
+    SELECT urny.id, urny.material, n.imie FROM urny
+        inner join nieboszczycy n on urny.id = n.id_urny
+        WHERE urny.id_krypty is null
+    Group By urny.id, n.imie;
+
+SELECT * from nieprzypisane_urny;
+
+SELECT * from materialy_trumien;

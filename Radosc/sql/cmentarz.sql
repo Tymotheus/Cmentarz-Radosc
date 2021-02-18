@@ -24,13 +24,18 @@ CREATE TYPE "material_urny" AS ENUM (
 );
 
 -- Enums for roles
+DROP TYPE IF EXISTS role_type CASCADE ;
 CREATE TYPE "role_type" AS ENUM(
     'admin',
     'klient'
 );
 
 -- Roles
-CREATE ROLE admin SUPERUSER ;
+-- DROP ROLE if EXISTS admin;
+-- CREATE ROLE admin SUPERUSER ;
+REASSIGN OWNED BY klient to admin;
+DROP OWNED BY klient;
+DROP ROLE if EXISTS klient;
 CREATE ROLE klient NOSUPERUSER;
 
 GRANT INSERT (imie, data_urodzenia, data_zgonu) on nieboszczycy  TO klient;
@@ -60,6 +65,7 @@ GRANT UPDATE (imie, data_urodzenia, data_zgonu) on nieboszczycy TO klient;
 -- ('Krypta kliencka', 2);
 
 -- Tables
+DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE "users"(
     "id" SERIAL PRIMARY KEY,
     "role" role_type DEFAULT 'klient', --Dostęp do wszystkich funkcjonalności tylko dla admina
@@ -122,6 +128,7 @@ CREATE TABLE "krypty" (
   "nazwa" varchar NOT NULL,
   "pojemnosc" int NOT NULL,
   "liczba_trumien" int DEFAULT (0),
+  "liczba_urn" int DEFAULT (0),
   "wybudowano" date DEFAULT (now())
 );
 
@@ -203,12 +210,15 @@ ALTER TABLE "wykonywanie_urn" ADD FOREIGN KEY ("id_urniarza") REFERENCES "urniar
 
 -- Note - I should also make sure that noone inserts too many trumnas
 -- into one krypta (we can not exceed its capacity)
+
+-- Funkcja dbająca o zlicznie trumn
 CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table$
     DECLARE
         _liczba_trumien INTEGER = (Select liczba_trumien from krypty where id=NEW.id_krypty);
+        _liczba_urn INTEGER = (Select liczba_urn from krypty where id=NEW.id_krypty);
         _pojemnosc INTEGER = (SELECT pojemnosc from krypty where id=NEW.id_krypty);
     BEGIN
-        IF (_liczba_trumien >= _pojemnosc) THEN
+        IF ( (_liczba_trumien+_liczba_urn) >= _pojemnosc) THEN
             RAISE exception 'Ta krypta jest już pełna';
         ELSE
             UPDATE krypty
@@ -223,12 +233,44 @@ CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table$
     $example_table$ LANGUAGE plpgsql;
 
 
-
+DROP TRIGGER IF EXISTS  zaktualizuj_liczbe_trumien on trumny;
 CREATE TRIGGER zaktualizuj_liczbe_trumien
     BEFORE UPDATE of id_krypty ON trumny
     FOR EACH ROW
     WHEN (OLD.id_krypty IS DISTINCT FROM NEW.id_krypty)
     EXECUTE PROCEDURE krypta1();
+
+
+-- Funkcja dbajaca o zliczanie urn
+CREATE OR REPLACE FUNCTION krypta2() RETURNS TRIGGER AS $example_table$
+    DECLARE
+        _liczba_urn INTEGER = (Select liczba_urn from krypty where id=NEW.id_krypty);
+        _liczba_trumien INTEGER = (Select liczba_trumien from krypty where id=NEW.id_krypty);
+        _pojemnosc INTEGER = (SELECT pojemnosc from krypty where id=NEW.id_krypty);
+    BEGIN
+        IF ( (_liczba_urn +_liczba_trumien)  >= _pojemnosc) THEN
+            RAISE exception 'Ta krypta jest już pełna';
+        ELSE
+            UPDATE krypty
+            SET liczba_urn = liczba_urn + 1
+            WHERE id = NEW.id_krypty;
+            UPDATE krypty
+            SET liczba_urn = liczba_urn - 1
+            WHERE id = OLD.id_krypty;
+            RETURN NEW;
+        END IF;
+    END
+    $example_table$ LANGUAGE plpgsql;
+
+
+
+CREATE TRIGGER zaktualizuj_liczbe_urn
+    BEFORE UPDATE of id_krypty ON urny
+    FOR EACH ROW
+    WHEN (OLD.id_krypty IS DISTINCT FROM NEW.id_krypty)
+    EXECUTE PROCEDURE krypta2();
+
+
 
 
 CREATE OR REPLACE FUNCTION nieboszczyk1() RETURNS TRIGGER AS $nieboszczykowy1$
@@ -246,7 +288,7 @@ CREATE TRIGGER sprawdz_nieboszczyka_na_insert
 -- 3. Seeding the database
 
 -- Dodawanie userów
-INSERT INTO users (role, imie)
+INSERT INTO users (role, username)
 VALUES
     ('klient', 'Nowy Klient'),
     ('admin', 'Admin');
@@ -526,5 +568,22 @@ CREATE VIEW materialy_trumien AS
     SELECT trumny.material, count(*) AS Ilosc FROM nieboszczycy
         inner join trumny on nieboszczycy.id_trumny = trumny.id
         GROUP BY trumny.material;
+
+
+-- Wszystkie trumny nieprzypisane nigdzie z trupkiem w środku
+CREATE OR REPLACE VIEW nieprzypisane_trumny AS
+    SELECT trumny.id, trumny.material, n.imie FROM trumny
+        inner join nieboszczycy n on trumny.id = n.id_trumny
+        WHERE trumny.id_krypty is null and trumny.id_nagrobka is null
+    Group By trumny.id, n.imie;
+
+-- Wszystkie urny nieprzypisane nigdzie z trupkiem w środku
+CREATE OR REPLACE VIEW nieprzypisane_urny AS
+    SELECT urny.id, urny.material, n.imie FROM urny
+        inner join nieboszczycy n on urny.id = n.id_urny
+        WHERE urny.id_krypty is null
+    Group By urny.id, n.imie;
+
+SELECT * from nieprzypisane_urny;
 
 SELECT * from nieboszczycy order by id;

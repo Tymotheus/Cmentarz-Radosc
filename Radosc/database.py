@@ -55,6 +55,16 @@ def postgres_send(func):
                 # print("PostgreSQL connection is closed")
     return wrapped_function
 
+@postgres_send
+def set_client_role():
+    print('Set role to client')
+    return f"SET ROLE klient"
+
+@postgres_send
+def set_admin_role():
+    print('Set role to admin')
+    return f"SET ROLE admin"
+
 # pobieranie danych z bazki
 @postgres_get
 def pobierz_krypty():
@@ -76,6 +86,14 @@ def pobierz_krematoria():
 def pobierz_sredni_wiek():
     return f"SELECT * FROM srednia_wieku"
 
+@postgres_get
+def pobierz_nieprzypisane_trumny():
+    return f"SELECT * FROM nieprzypisane_trumny"
+
+@postgres_get
+def pobierz_nieprzypisane_urny():
+    return f"SELECT * FROM nieprzypisane_urny"
+
 #wyszukuje konretnego nieboszczyka
 @postgres_get
 def wyszukaj_nieboszczyka(imie):
@@ -92,11 +110,21 @@ def mieszkancy_odrodzenia():
 #wyszukuje wszystkich mieszkandcow krypty
 #ich: imie, daty urodzenia i smierci i material trumny
 #struktura wyniku: [(imie1, urodzenie1, zgon1, material1), (imie2, urodzenie2...)...]
+
+#zwraca wszystkich mieszkancow danej krypty mieszkajacych w trumnach
 @postgres_get
-def mieszkancy_krypty(nazwa):
+def mieszkancy_krypty_trumny(nazwa):
     return f"SELECT nieboszczycy.imie, nieboszczycy.data_urodzenia, nieboszczycy.data_zgonu, trumny.material as Trumna \
 FROM nieboszczycy inner join trumny on nieboszczycy.id_trumny = trumny.id \
     inner join krypty on trumny.id_krypty=krypty.id \
+WHERE krypty.nazwa = ('{nazwa}') "
+
+#zwraca wszystkich mieszkancow danej krypty mieszkajacych w urnach
+@postgres_get
+def mieszkancy_krypty_urny(nazwa):
+    return f"SELECT nieboszczycy.imie, nieboszczycy.data_urodzenia, nieboszczycy.data_zgonu, urny.material as Urna \
+FROM nieboszczycy inner join urny on nieboszczycy.id_urny = urny.id \
+    inner join krypty on urny.id_krypty=krypty.id \
 WHERE krypty.nazwa = ('{nazwa}') "
 
 # wstawianie danych do bazki
@@ -106,6 +134,14 @@ def wstaw_krypte(nazwa, pojemnosc):
 
 @postgres_send
 def wstaw_nieboszczyka(imie, data_urodzenia, data_zgonu):
+    id_trumny = None
+    id_urny = None
+    if id_trumny is not None:
+        print("Opcja z trumną")
+        pass
+    elif id_urny is not None:
+        print("Opcja z urną")
+        pass
     return f"INSERT INTO nieboszczycy (imie, data_urodzenia, data_zgonu) VALUES ('{imie}', '{data_urodzenia}', '{data_zgonu}')"
 
 @postgres_send
@@ -115,3 +151,11 @@ def wstaw_kostnice(nazwa):
 @postgres_send
 def wstaw_krematorium(nazwa):
     return f"INSERT INTO krematoria (nazwa) VALUES ('{nazwa}')"
+
+@postgres_send
+def przypisz_trumnie_krypte(id_trumny, id_krypty):
+    return f"UPDATE trumny SET id_krypty=('{id_krypty}') WHERE id=('{id_trumny }')"
+
+@postgres_send
+def przypisz_urnie_krypte(id_urny, id_krypty):
+    return f"UPDATE urny SET id_krypty=('{id_krypty}') WHERE id=('{id_urny }')"

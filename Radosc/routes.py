@@ -4,11 +4,13 @@ from PIL import Image #for resizing uploaded images
 from flask import render_template, url_for, flash, redirect, request, abort
 from Radosc import app, db, bcrypt
 from Radosc.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, \
-NieboszczykForm, KryptaForm, KostnicaForm, KrematoriumForm, WyszukajNieboszczykaForm
+NieboszczykForm, KryptaForm, KostnicaForm, KrematoriumForm, WyszukajNieboszczykaForm,\
+PrzypiszTrumneForm, PrzypiszUrneForm
 from Radosc.database import wstaw_krypte, wstaw_kostnice, wstaw_krematorium, wstaw_nieboszczyka, \
 pobierz_krypty, pobierz_kostnice, pobierz_krematoria, pobierz_nieboszczykow, \
-pobierz_sredni_wiek, wyszukaj_nieboszczyka, mieszkancy_odrodzenia, mieszkancy_krypty, \
-set_admin_role, set_client_role
+pobierz_sredni_wiek, wyszukaj_nieboszczyka, mieszkancy_odrodzenia, mieszkancy_krypty_trumny, \
+set_admin_role, set_client_role, pobierz_nieprzypisane_trumny, pobierz_nieprzypisane_urny, \
+przypisz_trumnie_krypte, przypisz_urnie_krypte, mieszkancy_krypty_urny
 
 from Radosc.models import User, Post
 from flask_login import login_user, logout_user, current_user, login_required
@@ -25,16 +27,6 @@ def home():
 @app.route("/about")
 def about():
     return render_template('about.html', title='About')
-
-@app.route("/easteregg")
-def egg():
-    return "<h1> 🥚💕! </h1>"
-
-#just checking some functionalities - to dump
-#wooo is it using get method??? And returning nice and neat json?
-@app.route("/dydej/")
-def hello():
-    return jsonify({'name':'Antoni', 'surname':'Dydej'})
 
 @app.route('/nieboszczyk/', methods=['GET', 'POST'])
 def nieboszczyk():
@@ -78,21 +70,25 @@ def krypta():
     form = KryptaForm()
     #UWAGA będę teraz robił skomplikowaną operację!
     #Dla każdej krypty pobieram jej mieszkańców i zapisuję w zmiennej!
-    mieszkancy = [ mieszkancy_krypty(krypta[1]) for krypta in krypty]
-    print("Zmienna mieszkancy: " + str(mieszkancy) )
+    mieszkancy_trumny = [ mieszkancy_krypty_trumny(krypta[1]) for krypta in krypty]
+    mieszkancy_urny = [ mieszkancy_krypty_urny(krypta[1]) for krypta in krypty]
+    print("Zmienna mieszkancy trumny: " + str(mieszkancy_trumny) )
+    print("Zmienna mieszkancy urny: " + str(mieszkancy_urny))
     print()
-    krypty = list(zip(krypty,mieszkancy))
+    krypty = list(zip(krypty,mieszkancy_trumny, mieszkancy_urny))
+    print("Zmienna krypty: " + str(krypty))
     if form.validate_on_submit():
         #print(f"Nazwa: {form.nazwa_krypty.data} Pojemnosc: {form.pojemnosc.data}")
         wstaw_krypte(form.nazwa_krypty.data, form.pojemnosc.data)
         flash(f'Krypta została dodana', 'success')
         krypty = pobierz_krypty()
         print("Przed referencją: " + str(krypty) )
-        mieszkancy = [ mieszkancy_krypty(krypta[1]) for krypta in krypty]
-        krypty = list(zip(krypty,mieszkancy))
+        mieszkancy_trumny = [ mieszkancy_krypty_trumny(krypta[1]) for krypta in krypty]
+        mieszkancy_urny= [ mieszkancy_krypty_urny(krypta[1]) for krypta in krypty]
+        krypty = list(zip(krypty,mieszkancy_trumny,mieszkancy_urny))
         print("Zmienna krypty: " + str(krypty) )
     return render_template('krypta.html', title="Krypta", form=form, \
-            krypty=krypty, mieszkancy=mieszkancy)
+            krypty=krypty)
 
 
 @app.route('/kostnica/', methods=['GET', 'POST'])
@@ -118,6 +114,34 @@ def krematorium():
         flash(f'Krematorium zostało (prawie) dodane', 'success')
         krematoria = pobierz_krematoria()
     return render_template('krematorium.html', title="Krematorium", form=form, krematoria=krematoria)
+
+@app.route('/trumna/', methods=['GET', 'POST'])
+@login_required
+def trumna():
+    trumny = pobierz_nieprzypisane_trumny()
+    print(trumny)
+    form = PrzypiszTrumneForm()
+    if form.validate_on_submit():
+        przypisz_trumnie_krypte(form.id_trumny.data, form.id_krypty.data )
+        flash(f'Trumna została (chyba? Może?) dodana', 'success')
+        trumny = pobierz_nieprzypisane_trumny()
+        print(trumny)
+    return render_template('trumna.html', title="Trumny", form=form, trumny=trumny)
+
+@app.route('/urna/', methods=['GET', 'POST'])
+@login_required
+def urna():
+    urny = pobierz_nieprzypisane_urny()
+    print(urny)
+    form = PrzypiszUrneForm()
+    if form.validate_on_submit():
+        przypisz_urnie_krypte(form.id_urny.data, form.id_krypty.data )
+        flash(f'Urna została (chyba? Może?) dodana', 'success')
+        urny = pobierz_nieprzypisane_urny()
+        print(urny)
+    return render_template('urna.html', title="Urny", form=form, urny=urny)
+
+
 
 
 @app.route("/register/", methods=['GET', 'POST'])
@@ -193,49 +217,49 @@ def account():
     return render_template('account.html', title='Account',
                             image_file=image_file, form=form)
 
-
-@app.route("/post/new", methods=['GET', 'POST'])
-@login_required
-def new_post():
-    form = PostForm()
-    if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, author=current_user)
-        db.session.add(post)
-        db.session.commit()
-        flash("The post has been created!", 'success')
-        return redirect(url_for('home'))
-    return render_template('create_post.html', title='New Post', form=form, legend='New Post')
-
-@app.route("/post/<int:post_id>")
-def post(post_id):
-    post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=post.title, post=post)
-
-@app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
-@login_required
-def update_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
-        abort(403)
-    form = PostForm()
-    if form.validate_on_submit():
-        post.title = form.title.data
-        post.content = form.content.data
-        db.session.commit()
-        flash('Your post has been updated!', 'success')
-        return redirect(url_for('post', post_id=post.id))
-    elif request.method == 'GET':
-        form.title.data = post.title
-        form.content.data = post.content
-    return render_template('create_post.html', title='Update Post', form=form, legend='Update Post')
-
-@app.route("/post/<int:post_id>/delete", methods=['POST'])
-@login_required
-def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
-        abort(403)
-    db.session.delete(post)
-    db.session.commit()
-    flash('Your post has been deleted!', 'success')
-    return redirect(url_for('home'))
+#
+# @app.route("/post/new", methods=['GET', 'POST'])
+# @login_required
+# def new_post():
+#     form = PostForm()
+#     if form.validate_on_submit():
+#         post = Post(title=form.title.data, content=form.content.data, author=current_user)
+#         db.session.add(post)
+#         db.session.commit()
+#         flash("The post has been created!", 'success')
+#         return redirect(url_for('home'))
+#     return render_template('create_post.html', title='New Post', form=form, legend='New Post')
+#
+# @app.route("/post/<int:post_id>")
+# def post(post_id):
+#     post = Post.query.get_or_404(post_id)
+#     return render_template('post.html', title=post.title, post=post)
+#
+# @app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
+# @login_required
+# def update_post(post_id):
+#     post = Post.query.get_or_404(post_id)
+#     if post.author != current_user:
+#         abort(403)
+#     form = PostForm()
+#     if form.validate_on_submit():
+#         post.title = form.title.data
+#         post.content = form.content.data
+#         db.session.commit()
+#         flash('Your post has been updated!', 'success')
+#         return redirect(url_for('post', post_id=post.id))
+#     elif request.method == 'GET':
+#         form.title.data = post.title
+#         form.content.data = post.content
+#     return render_template('create_post.html', title='Update Post', form=form, legend='Update Post')
+#
+# @app.route("/post/<int:post_id>/delete", methods=['POST'])
+# @login_required
+# def delete_post(post_id):
+#     post = Post.query.get_or_404(post_id)
+#     if post.author != current_user:
+#         abort(403)
+#     db.session.delete(post)
+#     db.session.commit()
+#     flash('Your post has been deleted!', 'success')
+#     return redirect(url_for('home'))

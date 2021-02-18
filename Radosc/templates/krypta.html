@@ -57,7 +57,7 @@
         </div>
         <h2><a class="article-title" href="#">{{ krypta[0][1] }}</a></h2>
         <h4 class="article-content">Pojemność: {{ krypta[0][2]}}</h4>
-        <h4 class="article-content">Ilość obecnych rezydentów: {{ krypta[0][3]}}</h4>
+        <h4 class="article-content">Ilość obecnych rezydentów: {{ krypta[0][3] + krypta[0][4]}}</h4>
           {% if not krypta[1] %}
 
           {% else %}
@@ -68,6 +68,12 @@
                  <b>Data zgonu: </b> {{ klient[2] }} <br>
                  <b>Trumna: </b> {{ klient[3] }}</p> <br>
              {% endfor %}
+             {% for klient in krypta[2] %}
+               <p><b>Imię </b>{{ klient[0] }} <br>
+                  <b>Data urodzenia: </b> {{ klient[1] }} <br>
+                  <b>Data zgonu: </b> {{ klient[2] }} <br>
+                  <b>Urna: </b> {{ klient[3] }}</p> <br>
+              {% endfor %}
           {% endif %}
         </div>
 

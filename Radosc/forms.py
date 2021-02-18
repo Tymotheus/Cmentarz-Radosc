@@ -34,7 +34,7 @@ class NieboszczykForm(FlaskForm):
                 validators=[DataRequired(), Length(min=4)])
     data_urodzenia = DateField('Data urodzenia', validators=[DataRequired()])
     data_zgonu = DateField('Data zgonu', validators=[DataRequired()])
-
+    # result =
     submit = SubmitField('Zarejestruj Nieboszczyka')
     #TO ADD
     #czy urna czy trumna?
@@ -58,7 +58,18 @@ class KrematoriumForm(FlaskForm):
     nazwa_krematorium = StringField('Nazwa krematorium', validators=[DataRequired()])
     submit = SubmitField('Dodaj krematorium')
 
+#przypisanie trumien
+class PrzypiszTrumneForm(FlaskForm):
+    id_trumny = IntegerField('ID trumny', validators=[DataRequired()])
+    id_krypty = IntegerField('ID krypty', validators=[DataRequired()])
+    submit = SubmitField('Przypisz trumnę')
 
+
+#przypisanie urn
+class PrzypiszUrneForm(FlaskForm):
+    id_urny = IntegerField('ID urny', validators=[DataRequired()])
+    id_krypty = IntegerField('ID krypty', validators=[DataRequired()])
+    submit = SubmitField('Przypisz urnę')
 
 #wyszukiwanie nieboszczyków
 class WyszukajNieboszczykaForm(FlaskForm):

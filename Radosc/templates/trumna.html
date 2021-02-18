@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+  <div class="content-section">
+    <form class="" action="" method="POST">
+      {{ form.hidden_tag() }}
+      <fieldset class="form-group">
+        <legend class="border-bottom mb-4">Przypisz trumnę</legend>
+        <div class="form-group">
+            {{ form.id_trumny.label(class="form-control-label")}}
+
+            {% if form.id_trumny.errors %}
+              {{ form.id_trumny(class="form-control form-control-lg is-invalid")}}
+              <div class="invalid-feedback">
+                  {% for error in form.id_trumny.errors %}
+                    <span>{{ error}}</span>
+                  {% endfor %}
+              </div>
+              {% else %}
+                  {{ form.id_trumny(class="form-control form-control-lg", type="number", value=1)}}
+              {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form.id_krypty.label(class="form-control-label")}}
+
+            {% if form.id_krypty.errors %}
+              {{ form.id_krypty(class="form-control form-control-lg is-invalid")}}
+              <div class="invalid-feedback">
+                  {% for error in form.id_krypty.errors %}
+                    <span>{{ error}}</span>
+                  {% endfor %}
+              </div>
+              {% else %}
+                  {{ form.id_krypty(class="form-control form-control-lg", type="number", value=1)}}
+              {% endif %}
+        </div>
+
+    </fieldset>
+    <div class="form-group">
+        {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+    </form>
+
+  </div>
+
+    <article class="media content-section custom-subtitle">
+      <h2>Trumny czekające na przypisanie</h2>
+    </article>
+    {% for trumna in trumny %}
+    <article class="media content-section">
+      <div class="media-body">
+        <div class="article-metadata">
+          <small class="text-muted">ID trumny: {{ trumna[0] }}</small>
+        </div>
+        <h3 class="article-title">Materiał: {{ trumna[1] }}</h3>
+        <h3><a class="article-title" href="#">Nieboszczyk: {{ trumna[2] }}</a></h3>
+      </div>
+    </article>
+    {% endfor %}
+
+
+{% endblock content %}

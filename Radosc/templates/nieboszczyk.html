@@ -6,7 +6,7 @@
       <form class="" action="" method="POST">
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
-          <legend class="border-bottom mb-4">Podaj dane nowego nieboszczyka!</legend>
+          <legend class="border-bottom mb-4">Podaj dane nowego nieboszczyka</legend>
           <div class="form-group">
               {{ form.username.label(class="form-control-label")}}
 
@@ -50,27 +50,66 @@
                 {% endif %}
           </div>
       </fieldset>
-<!-- Radio buttons section -->
+<!-- Radio buttons section urny i trumny -->
       <fieldset class="form-group">
-        <legend>Radio buttons</legend>
+        <legend>Wybierz trumnę lub urnę</legend>
+
         <div class="form-check">
           <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-            Option one is this and that&mdash;be sure to include why it's great
+            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios1" value="olcha" checked>
+            Trumna olcha
           </label>
         </div>
+
         <div class="form-check">
-        <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2">
-            Option two can be something else and selecting it will deselect option one
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios2" value="sosna">
+            Trumna sosna
           </label>
         </div>
-        <div class="form-check disabled">
-        <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios3" value="option3" disabled>
-            Option three is disabled
+
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios3" value="dab">
+            Trumna dąb
           </label>
         </div>
+        <br>
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios4" value="metal">
+            Urna metal
+          </label>
+        </div>
+
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios5" value="kamien">
+            Urna kamień
+          </label>
+        </div>
+
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios6" value="mosiadz">
+            Urna mosiądz
+          </label>
+        </div>
+
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios7" value="drewno">
+            Urna drewno
+          </label>
+        </div>
+
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios8" value="szklo">
+            Urna szkło
+          </label>
+        </div>
+
     </fieldset>
 <!-- End of radio buttons, time for submit -->
       <div class="form-group">
