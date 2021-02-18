@@ -33,3 +33,6 @@ Watched Correy's flask tutorials and have working skeleton; created basic logic 
 * Adding proper authorisation and access levels for customers/workers
 * Clean the project (in general) - there is some dead code, also from the blog-like skeleton - for example .js script and mechanics of blogposts
 * Not exactly sure if granting client/admin role in current model shouldn't be done before every query - this one right now is a bit messy and done only to meet general criteria of the project
+* Making the forms to automatically clean whenever they are sent
+* There are a lot of prints around which, I believe, could be changed to system.logs - and displayed only when the appropriate flag is set
+* Check out all HTML files and correct the indentations :/

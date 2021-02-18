@@ -2,51 +2,135 @@
 
 {% block content %}
 
+<div class="content-section">
+  <form class="" action="" method="POST">
+    {{ form_nieboszczyk.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Przypisz wolną trumnę do nieboszczyka</legend>
+      <div class="form-group">
+          {{ form_nieboszczyk.id_nieboszczyka.label(class="form-control-label")}}
+
+          {% if form_nieboszczyk.id_nieboszczyka.errors %}
+            {{ form_nieboszczyk.id_nieboszczyka(class="form-control form-control-lg is-invalid")}}
+            <div class="invalid-feedback">
+                {% for error in form_nieboszczyk.id_nieboszczyka.errors %}
+                  <span>{{ error}}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+                {{ form_nieboszczyk.id_nieboszczyka(class="form-control form-control-lg", type="number", value=1)}}
+            {% endif %}
+      </div>
+
+      <div class="form-group">
+          {{ form_nieboszczyk.id_trumny.label(class="form-control-label")}}
+
+          {% if form_nieboszczyk.id_trumny.errors %}
+            {{ form_nieboszczyk.id_trumny(class="form-control form-control-lg is-invalid")}}
+            <div class="invalid-feedback">
+                {% for error in form_nieboszczyk.id_trumny.errors %}
+                  <span>{{ error}}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+                {{ form_nieboszczyk.id_trumny(class="form-control form-control-lg", type="number", value=1)}}
+            {% endif %}
+      </div>
+
+  </fieldset>
+    <div class="form-group">
+        {{ form_nieboszczyk.submit(class="btn btn-outline-info") }}
+    </div>
+  </form>
+  </div>
+
   <div class="content-section">
     <form class="" action="" method="POST">
-      {{ form.hidden_tag() }}
+      {{ form_krypta.hidden_tag() }}
       <fieldset class="form-group">
-        <legend class="border-bottom mb-4">Przypisz trumnę</legend>
+        <legend class="border-bottom mb-4">Przypisz trumnę do krypty</legend>
         <div class="form-group">
-            {{ form.id_trumny.label(class="form-control-label")}}
+            {{ form_krypta.id_trumny.label(class="form-control-label")}}
 
-            {% if form.id_trumny.errors %}
-              {{ form.id_trumny(class="form-control form-control-lg is-invalid")}}
+            {% if form_krypta.id_trumny.errors %}
+              {{ form_krypta.id_trumny(class="form-control form-control-lg is-invalid")}}
               <div class="invalid-feedback">
-                  {% for error in form.id_trumny.errors %}
+                  {% for error in form_krypta.id_trumny.errors %}
                     <span>{{ error}}</span>
                   {% endfor %}
               </div>
               {% else %}
-                  {{ form.id_trumny(class="form-control form-control-lg", type="number", value=1)}}
+                  {{ form_krypta.id_trumny(class="form-control form-control-lg", type="number", value=1)}}
               {% endif %}
         </div>
 
         <div class="form-group">
-            {{ form.id_krypty.label(class="form-control-label")}}
+            {{ form_krypta.id_krypty.label(class="form-control-label")}}
 
-            {% if form.id_krypty.errors %}
-              {{ form.id_krypty(class="form-control form-control-lg is-invalid")}}
+            {% if form_krypta.id_krypty.errors %}
+              {{ form_krypta.id_krypty(class="form-control form-control-lg is-invalid")}}
               <div class="invalid-feedback">
-                  {% for error in form.id_krypty.errors %}
+                  {% for error in form_krypta.id_krypty.errors %}
                     <span>{{ error}}</span>
                   {% endfor %}
               </div>
               {% else %}
-                  {{ form.id_krypty(class="form-control form-control-lg", type="number", value=1)}}
+                  {{ form_krypta.id_krypty(class="form-control form-control-lg", type="number", value=1)}}
               {% endif %}
         </div>
 
     </fieldset>
     <div class="form-group">
-        {{ form.submit(class="btn btn-outline-info") }}
+        {{ form_krypta.submit(class="btn btn-outline-info") }}
+    </div>
+    </form>
+    </div>
+
+    <div class="content-section">
+    <form class="" action="" method="POST">
+      {{ form_nagrobek.hidden_tag() }}
+      <fieldset class="form-group">
+        <legend class="border-bottom mb-4">Przypisz trumnę do nagrobka</legend>
+        <div class="form-group">
+            {{ form_nagrobek.id_trumny.label(class="form-control-label")}}
+
+            {% if form_nagrobek.id_trumny.errors %}
+              {{ form_nagrobek.id_trumny(class="form-control form-control-lg is-invalid")}}
+              <div class="invalid-feedback">
+                  {% for error in form_nagrobek.id_trumny.errors %}
+                    <span>{{ error}}</span>
+                  {% endfor %}
+              </div>
+              {% else %}
+                  {{ form_nagrobek.id_trumny(class="form-control form-control-lg", type="number", value=1)}}
+              {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form_nagrobek.id_nagrobka.label(class="form-control-label")}}
+
+            {% if form_nagrobek.id_nagrobka.errors %}
+              {{ form_nagrobek.id_nagrobka(class="form-control form-control-lg is-invalid")}}
+              <div class="invalid-feedback">
+                  {% for error in form_nagrobek.id_nagrobka.errors %}
+                    <span>{{ error}}</span>
+                  {% endfor %}
+              </div>
+              {% else %}
+                  {{ form_nagrobek.id_nagrobka(class="form-control form-control-lg", type="number", value=1)}}
+              {% endif %}
+        </div>
+
+    </fieldset>
+    <div class="form-group">
+        {{ form_nagrobek.submit(class="btn btn-outline-info") }}
     </div>
     </form>
 
   </div>
 
     <article class="media content-section custom-subtitle">
-      <h2>Trumny czekające na przypisanie</h2>
+      <h2>Trumny czekające na dalsze przypisanie</h2>
     </article>
     {% for trumna in trumny %}
     <article class="media content-section">
@@ -56,6 +140,20 @@
         </div>
         <h3 class="article-title">Materiał: {{ trumna[1] }}</h3>
         <h3><a class="article-title" href="#">Nieboszczyk: {{ trumna[2] }}</a></h3>
+      </div>
+    </article>
+    {% endfor %}
+
+    <article class="media content-section custom-subtitle">
+      <h2>Puste trumny</h2>
+    </article>
+    {% for trumna in puste_trumny %}
+    <article class="media content-section">
+      <div class="media-body">
+        <div class="article-metadata">
+          <small class="text-muted">ID trumny: {{ trumna[0] }}</small>
+        </div>
+        <h3 class="article-title">Materiał: {{ trumna[1] }}</h3>
       </div>
     </article>
     {% endfor %}

@@ -50,68 +50,7 @@
                 {% endif %}
           </div>
       </fieldset>
-<!-- Radio buttons section urny i trumny -->
-      <fieldset class="form-group">
-        <legend>Wybierz trumnę lub urnę</legend>
 
-        <div class="form-check">
-          <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios1" value="olcha" checked>
-            Trumna olcha
-          </label>
-        </div>
-
-        <div class="form-check">
-          <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios2" value="sosna">
-            Trumna sosna
-          </label>
-        </div>
-
-        <div class="form-check">
-          <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios3" value="dab">
-            Trumna dąb
-          </label>
-        </div>
-        <br>
-        <div class="form-check">
-          <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios4" value="metal">
-            Urna metal
-          </label>
-        </div>
-
-        <div class="form-check">
-          <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios5" value="kamien">
-            Urna kamień
-          </label>
-        </div>
-
-        <div class="form-check">
-          <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios6" value="mosiadz">
-            Urna mosiądz
-          </label>
-        </div>
-
-        <div class="form-check">
-          <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios7" value="drewno">
-            Urna drewno
-          </label>
-        </div>
-
-        <div class="form-check">
-          <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios8" value="szklo">
-            Urna szkło
-          </label>
-        </div>
-
-    </fieldset>
-<!-- End of radio buttons, time for submit -->
       <div class="form-group">
           {{ form.submit(class="btn btn-outline-info") }}
       </div>
@@ -158,6 +97,24 @@
     {% endif %}
   </div>
 </article>
+{% if current_user.is_authenticated %}
+  <article class="media content-section custom-subtitle" style="flex-direction: column">
+    <h2 class="article-title"> Nieprzypisani nieboszczycy</h2>
+  </article>
+  {% for nieboszczyk in nieprzypisani_nieboszczycy %}
+  <article class="media content-section">
+    <div class="media-body">
+      <div class="article-metadata">
+        <small class="text-muted">ID {{ nieboszczyk[0] }}</small>
+      </div>
+      <h2><a class="article-title" href="#">{{ nieboszczyk[1] }}</a></h2>
+      <p><b>Data urodzenia:</b> {{ nieboszczyk[2] }} <br>
+         <b>Data zgonu:</b> {{ nieboszczyk[3] }}</p>
+    </div>
+  </article>
+{% endfor %}
+
+{% endif %}
 
     <article class="media content-section custom-subtitle" style="flex-direction: column">
       <h2 class="article-title"> Nasi klienci</h2>
@@ -177,4 +134,7 @@
       </div>
     </article>
     {% endfor %}
+
+
+
 {% endblock content %}

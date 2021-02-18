@@ -3,14 +3,9 @@ import secrets
 from PIL import Image #for resizing uploaded images
 from flask import render_template, url_for, flash, redirect, request, abort
 from Radosc import app, db, bcrypt
-from Radosc.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, \
-NieboszczykForm, KryptaForm, KostnicaForm, KrematoriumForm, WyszukajNieboszczykaForm,\
-PrzypiszTrumneForm, PrzypiszUrneForm
-from Radosc.database import wstaw_krypte, wstaw_kostnice, wstaw_krematorium, wstaw_nieboszczyka, \
-pobierz_krypty, pobierz_kostnice, pobierz_krematoria, pobierz_nieboszczykow, \
-pobierz_sredni_wiek, wyszukaj_nieboszczyka, mieszkancy_odrodzenia, mieszkancy_krypty_trumny, \
-set_admin_role, set_client_role, pobierz_nieprzypisane_trumny, pobierz_nieprzypisane_urny, \
-przypisz_trumnie_krypte, przypisz_urnie_krypte, mieszkancy_krypty_urny
+from Radosc.forms import *
+from Radosc.database import *
+
 
 from Radosc.models import User, Post
 from flask_login import login_user, logout_user, current_user, login_required
@@ -31,7 +26,11 @@ def about():
 @app.route('/nieboszczyk/', methods=['GET', 'POST'])
 def nieboszczyk():
     nieboszczycy = pobierz_nieboszczykow()
+    print("Nieboszczycy:")
     print(nieboszczycy)
+    nieprzypisani_nieboszczycy = pobierz_nieprzypisanych_nieboszczykow()
+    print("Nieprzypisani nieboszczycy:")
+    print(nieprzypisani_nieboszczycy)
     form = NieboszczykForm()
     wyszukaj_form = WyszukajNieboszczykaForm()
     sredni_wiek = round(pobierz_sredni_wiek()[0][0], 2)
@@ -44,6 +43,7 @@ def nieboszczyk():
         print('**************************************************************')
         flash(f'Twoje zgłoszenie zostało odnotowane', 'success')
         nieboszczycy = pobierz_nieboszczykow()
+        nieprzypisani_nieboszczycy = pobierz_nieprzypisanych_nieboszczykow()
         sredni_wiek = round(pobierz_sredni_wiek()[0][0], 2)
 
     #formularz do wyszukiwania nieboszczyków
@@ -58,7 +58,8 @@ def nieboszczyk():
         print(search_result)
     return render_template('nieboszczyk.html', title='Zaaplikuj', form=form, \
         wyszukaj_form=wyszukaj_form, nieboszczycy=nieboszczycy, \
-        sredni_wiek=sredni_wiek, search_result=search_result)
+        sredni_wiek=sredni_wiek, search_result=search_result, \
+        nieprzypisani_nieboszczycy=nieprzypisani_nieboszczycy)
 
 
 # Te 3 routy poniżej powinny być dostępne po zalogowaniu
@@ -90,6 +91,16 @@ def krypta():
     return render_template('krypta.html', title="Krypta", form=form, \
             krypty=krypty)
 
+@app.route('/nagrobek/', methods=['GET', 'POST'])
+def nagrobek():
+    zajete_nagrobki = pobierz_zajete_nagrobki()
+    nieprzypisane_nagrobki = pobierz_nieprzypisane_nagrobki()
+    print("Zajęte nagrobki: ")
+    print(zajete_nagrobki)
+    print("Nieprzypisane nagrobki: ")
+    print(nieprzypisane_nagrobki)
+    return render_template('nagrobek.html', title='Nagrobek', \
+        zajete_nagrobki=zajete_nagrobki, nieprzypisane_nagrobki=nieprzypisane_nagrobki )
 
 @app.route('/kostnica/', methods=['GET', 'POST'])
 def kostnica():
@@ -120,26 +131,61 @@ def krematorium():
 def trumna():
     trumny = pobierz_nieprzypisane_trumny()
     print(trumny)
-    form = PrzypiszTrumneForm()
-    if form.validate_on_submit():
-        przypisz_trumnie_krypte(form.id_trumny.data, form.id_krypty.data )
-        flash(f'Trumna została (chyba? Może?) dodana', 'success')
+    puste_trumny = pobierz_puste_trumny()
+    print("Puste trumny")
+    print(puste_trumny)
+    form_krypta = PrzypiszTrumneKrypcieForm()
+    form_nagrobek = PrzypiszTrumneNagrobkowiForm()
+    form_nieboszczyk = PrzypiszTrumneNieboszczykowiForm()
+    if form_nieboszczyk.validate_on_submit():
+        przypisz_nieboszczyka_do_trumny(form_nieboszczyk.id_nieboszczyka.data, form_nieboszczyk.id_trumny.data )
+        flash(f'Trumna została (chyba? Może?) dodana do nieboszczyka', 'success')
         trumny = pobierz_nieprzypisane_trumny()
         print(trumny)
-    return render_template('trumna.html', title="Trumny", form=form, trumny=trumny)
+        puste_trumny = pobierz_puste_trumny()
+    elif form_krypta.validate_on_submit():
+        przypisz_trumnie_krypte(form_krypta.id_trumny.data, form_krypta.id_krypty.data )
+        flash(f'Trumna została (chyba? Może?) dodana do krypty', 'success')
+        trumny = pobierz_nieprzypisane_trumny()
+        print(trumny)
+        puste_trumny = pobierz_puste_trumny()
+    elif form_nagrobek.validate_on_submit():
+        przypisz_trumnie_nagrobek(form_nagrobek.id_trumny.data, form_nagrobek.id_nagrobka.data )
+        flash(f'Trumna została (chyba? Może?) dodana do nagrobka', 'success')
+        trumny = pobierz_nieprzypisane_trumny()
+        print(trumny)
+        puste_trumny = pobierz_puste_trumny()
+    return render_template('trumna.html', title="Trumny", form_krypta=form_krypta,\
+     form_nagrobek =form_nagrobek, form_nieboszczyk=form_nieboszczyk, \
+     trumny=trumny, puste_trumny=puste_trumny)
 
 @app.route('/urna/', methods=['GET', 'POST'])
 @login_required
 def urna():
     urny = pobierz_nieprzypisane_urny()
     print(urny)
-    form = PrzypiszUrneForm()
-    if form.validate_on_submit():
-        przypisz_urnie_krypte(form.id_urny.data, form.id_krypty.data )
-        flash(f'Urna została (chyba? Może?) dodana', 'success')
+    puste_urny = pobierz_puste_urny()
+    print("Puste urny")
+    print(puste_urny)
+    form_krypta = PrzypiszUrneKrypcieForm()
+    form_nieboszczyk = PrzypiszUrneNieboszczykowiForm()
+    if form_krypta.validate_on_submit():
+        przypisz_urnie_krypte(form_krypta.id_urny.data, form_krypta.id_krypty.data )
+        flash(f'Urna została (chyba? Może?) dodana do krypty', 'success')
         urny = pobierz_nieprzypisane_urny()
         print(urny)
-    return render_template('urna.html', title="Urny", form=form, urny=urny)
+        puste_urny = pobierz_puste_urny()
+        print(puste_urny)
+    if form_nieboszczyk.validate_on_submit():
+        przypisz_nieboszczyka_do_urny(form_nieboszczyk.id_nieboszczyka.data, form_nieboszczyk.id_urny.data )
+        flash(f'Urna została (chyba? Może?) dodana do nieboszczyka', 'success')
+        urny = pobierz_nieprzypisane_urny()
+        print(urny)
+        puste_urny = pobierz_puste_urny()
+        print(puste_urny)
+
+    return render_template('urna.html', title="Urny", form_krypta=form_krypta,\
+    form_nieboszczyk=form_nieboszczyk, urny=urny, puste_urny=puste_urny)
 
 
 
@@ -216,50 +262,3 @@ def account():
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account',
                             image_file=image_file, form=form)
-
-#
-# @app.route("/post/new", methods=['GET', 'POST'])
-# @login_required
-# def new_post():
-#     form = PostForm()
-#     if form.validate_on_submit():
-#         post = Post(title=form.title.data, content=form.content.data, author=current_user)
-#         db.session.add(post)
-#         db.session.commit()
-#         flash("The post has been created!", 'success')
-#         return redirect(url_for('home'))
-#     return render_template('create_post.html', title='New Post', form=form, legend='New Post')
-#
-# @app.route("/post/<int:post_id>")
-# def post(post_id):
-#     post = Post.query.get_or_404(post_id)
-#     return render_template('post.html', title=post.title, post=post)
-#
-# @app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
-# @login_required
-# def update_post(post_id):
-#     post = Post.query.get_or_404(post_id)
-#     if post.author != current_user:
-#         abort(403)
-#     form = PostForm()
-#     if form.validate_on_submit():
-#         post.title = form.title.data
-#         post.content = form.content.data
-#         db.session.commit()
-#         flash('Your post has been updated!', 'success')
-#         return redirect(url_for('post', post_id=post.id))
-#     elif request.method == 'GET':
-#         form.title.data = post.title
-#         form.content.data = post.content
-#     return render_template('create_post.html', title='Update Post', form=form, legend='Update Post')
-#
-# @app.route("/post/<int:post_id>/delete", methods=['POST'])
-# @login_required
-# def delete_post(post_id):
-#     post = Post.query.get_or_404(post_id)
-#     if post.author != current_user:
-#         abort(403)
-#     db.session.delete(post)
-#     db.session.commit()
-#     flash('Your post has been deleted!', 'success')
-#     return redirect(url_for('home'))

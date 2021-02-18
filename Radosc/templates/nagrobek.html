@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+<article class="media content-section custom-subtitle">
+  <h2>Nagrobki</h2>
+</article>
+{% for grobek in zajete_nagrobki %}
+<article class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata">
+      <small class="text-muted">ID {{ grobek[0] }}</small>
+    </div>
+    <h2><a class="article-title" href="#">Nieboszczyk: {{ grobek[2] }}</a></h2>
+    <h2>Materiał: {{ grobek[1] }}</h2>
+  </div>
+</article>
+{% endfor %}
+
+
+{% if current_user.is_authenticated %}
+
+    <article class="media content-section custom-subtitle">
+      <h2>Wolne nagrobki</h2>
+    </article>
+    {% for nagrobek in nieprzypisane_nagrobki %}
+    <article class="media content-section">
+      <div class="media-body">
+        <div class="article-metadata">
+          <small class="text-muted">ID nagrobka: {{ nagrobek[0] }}</small>
+        </div>
+        <h3 class="article-title">Materiał: {{ nagrobek[1] }}</h3>
+
+      </div>
+    </article>
+    {% endfor %}
+
+{% endif %}
+
+{% endblock content %}

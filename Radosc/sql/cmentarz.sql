@@ -212,7 +212,7 @@ ALTER TABLE "wykonywanie_urn" ADD FOREIGN KEY ("id_urniarza") REFERENCES "urniar
 -- into one krypta (we can not exceed its capacity)
 
 -- Funkcja dbająca o zlicznie trumn
-CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table$
+CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table_1$
     DECLARE
         _liczba_trumien INTEGER = (Select liczba_trumien from krypty where id=NEW.id_krypty);
         _liczba_urn INTEGER = (Select liczba_urn from krypty where id=NEW.id_krypty);
@@ -230,7 +230,7 @@ CREATE OR REPLACE FUNCTION krypta1() RETURNS TRIGGER AS $example_table$
             RETURN NEW;
         END IF;
     END
-    $example_table$ LANGUAGE plpgsql;
+    $example_table_1$ LANGUAGE plpgsql;
 
 
 DROP TRIGGER IF EXISTS  zaktualizuj_liczbe_trumien on trumny;
@@ -242,7 +242,7 @@ CREATE TRIGGER zaktualizuj_liczbe_trumien
 
 
 -- Funkcja dbajaca o zliczanie urn
-CREATE OR REPLACE FUNCTION krypta2() RETURNS TRIGGER AS $example_table$
+CREATE OR REPLACE FUNCTION krypta2() RETURNS TRIGGER AS $example_table_2$
     DECLARE
         _liczba_urn INTEGER = (Select liczba_urn from krypty where id=NEW.id_krypty);
         _liczba_trumien INTEGER = (Select liczba_trumien from krypty where id=NEW.id_krypty);
@@ -260,7 +260,7 @@ CREATE OR REPLACE FUNCTION krypta2() RETURNS TRIGGER AS $example_table$
             RETURN NEW;
         END IF;
     END
-    $example_table$ LANGUAGE plpgsql;
+    $example_table_2$ LANGUAGE plpgsql;
 
 
 
@@ -270,6 +270,24 @@ CREATE TRIGGER zaktualizuj_liczbe_urn
     WHEN (OLD.id_krypty IS DISTINCT FROM NEW.id_krypty)
     EXECUTE PROCEDURE krypta2();
 
+CREATE OR REPLACE FUNCTION nagrobek1() RETURNS TRIGGER AS $example_table_3$
+    DECLARE
+        _imie varchar = (SELECT imie from nieboszczycy where id_trumny=NEW.id);
+    BEGIN
+            UPDATE nagrobki
+            SET imie = _imie
+            WHERE id = NEW.id_nagrobka;
+            RETURN NEW;
+    END
+    $example_table_3$ LANGUAGE plpgsql;
+
+
+DROP TRIGGER IF EXISTS  zaktualizuj_imiona_nagrobka on trumny;
+CREATE TRIGGER zaktualizuj_imiona_nagrobka
+    BEFORE UPDATE of id_nagrobka ON trumny
+    FOR EACH ROW
+    WHEN (OLD.id_nagrobka IS DISTINCT FROM NEW.id_nagrobka)
+    EXECUTE PROCEDURE nagrobek1();
 
 
 
@@ -298,7 +316,7 @@ insert into krypty (nazwa, pojemnosc, wybudowano) VALUES
 ('Krypta Odrodzenia', 4, '15.04.1452'),
 ('Krypta św. Leonarda', 10, '25.12.1117'),
 ('Krypta 101', 13, '14.09.2011'),
-('Krypta Norymberska', 5, '2.08.1928');
+('Krypta Norymberska', 2, '2.08.1928');
 
 -- Dodawanie kostnic
 INSERT INTO kostnice (nazwa) VALUES
@@ -319,7 +337,15 @@ INSERT INTO trumny (material, id_kostnicy) VALUES
 ('sosna', 1),
 ('olcha', 1),
 ('olcha', 1),
+('sosna', 1),
+('olcha', 1),
+('olcha', 1),
+('dąb', 1),
+('dąb', 1),
+('sosna', 1),
+('sosna', 1),
 ('sosna', 1);
+
 
 -- Dodawanie urn
 insert into urny (material, id_krematorium) VALUES
@@ -334,8 +360,10 @@ insert into urny (material, id_krematorium) VALUES
 INSERT INTO nagrobki (material) VALUES
 ('granit'),
 ('marmur'),
-('piaskowiec');
-
+('piaskowiec'),
+('marmur'),
+('piaskowiec'),
+('granit');
 
 -- Dodawanie nieboszczyków
 INSERT INTO nieboszczycy (imie, data_urodzenia, data_zgonu) VALUES
@@ -346,7 +374,10 @@ INSERT INTO nieboszczycy (imie, data_urodzenia, data_zgonu) VALUES
 ( 'Wacław Sierpiński', '14.03.1882', '21.10.1969') ,
 ( 'Marian Smoluchowski', '28.05.1872', '5.09.1917'),
 ( 'Leopold Infeld', '20.08.1898', '15.01.1968'),
-( 'Aleksander Wolszczan', '29.04.1946', '10.11.2036')                                                                   ;
+( 'Aleksander Wolszczan', '29.04.1946', '10.11.2036'),
+( 'Karol Borsuk', '8.05.1905', '24.01.1982'),
+( 'Stanisław Mazur', '1.01.1905', '5.11.1981'),
+( 'Marian Rejewski', '16.08.1905', '13.02.1980');
 
 -- Dodawanie trumniarzy
 INSERT INTO trumniarze (imie) VALUES
@@ -400,9 +431,12 @@ INSERT INTO wykonywanie_urn (id_urniarza, id_urny) VALUES
 -- Ustaw Banachowi pierwszą dębową trumnę
 update nieboszczycy
 set id_trumny = (
-    with id_trumny as (
-    select * from trumny where material = 'dąb' and id_krypty is null and id_nagrobka is null limit 1
-) select id from id_trumny
+    with pierwsza as (
+        SELECT trumny.* from trumny left join nieboszczycy n on trumny.id = n.id_trumny
+        WHERE material = 'dąb' and n.id is null
+        group by trumny.id, n.id
+        limit 1)
+    select id from pierwsza
 ) where imie='Stefan Banach';
 
 -- Nadanie jego trumnie odpowiedniej krypty 1 (takiej trumnie która trzyma Banacha)
@@ -419,16 +453,31 @@ UPDATE nieboszczycy
 SET id_urny=1
 WHERE imie = 'Stanisław Ulam';
 
+--Dodanie Borsukowi odpowiedniej trumny - pierwszej olszanej
+UPDATE nieboszczycy
+SET id_trumny = (
+    with pierwsza as (
+        SELECT trumny.* from trumny left join nieboszczycy n on trumny.id = n.id_trumny
+        WHERE material = 'olcha' and n.id is null
+        group by trumny.id, n.id
+        limit 1)
+    select id from pierwsza
+    )
+WHERE imie='Karol Borsuk';
+
 
 --Dodanie Sierpińskiemu odpowiedniej trumny - pierwszej olszanej
 UPDATE nieboszczycy
 SET id_trumny = (
-    with id_trumny as (
-        select * from trumny where material = 'olcha' and id_krypty is null and id_nagrobka is null limit 1
-    )
-    select id
-    from id_trumny
+    with pierwsza as (
+        SELECT trumny.* from trumny left join nieboszczycy n on trumny.id = n.id_trumny
+        WHERE material = 'olcha' and n.id is null
+        group by trumny.id, n.id
+        limit 1)
+    select id from pierwsza
 )WHERE imie='Wacław Sierpiński';
+
+select * from trumny where (material = 'olcha' and id_krypty is null and id_nagrobka is null) limit 1;
 
 -- Nadanie jego trumnie odpowiedniego nagrobka (takiej trumnie która trzyma Sierpińskiego)
 update trumny
@@ -442,35 +491,40 @@ set id_nagrobka = (
 select trumny.id from trumny left join nieboszczycy on trumny.id = nieboszczycy.id_trumny where nieboszczycy.imie = 'Wacław Sierpiński'
 );
 
--- Nagrobek trzymający Sierpińskiego
-select nagrobki.* from nagrobki
-    inner join trumny on nagrobki.id=trumny.id_nagrobka
-    inner join nieboszczycy on nieboszczycy.id_trumny = trumny.id
-where nieboszczycy.imie='Wacław Sierpiński';
+--Dodanie Mazurowi odpowiedniej trumny - pierwszej sosnowej
+UPDATE nieboszczycy
+SET id_trumny = (
+    with pierwsza as (
+        SELECT trumny.* from trumny left join nieboszczycy n on trumny.id = n.id_trumny
+        WHERE material = 'sosna' and n.id is null
+        group by trumny.id, n.id
+        limit 1)
+    select id from pierwsza
+)WHERE imie='Stanisław Mazur';
+
+
 
 -- Dodanie Smoluchowskiemu dębowej trumny
 update nieboszczycy
 set id_trumny = (
-    with id_trumny as (
-    select * from trumny where material = 'dąb' and id_krypty is null and id_nagrobka is null limit 1
-) select id from id_trumny
+    with pierwsza as (
+        SELECT trumny.* from trumny left join nieboszczycy n on trumny.id = n.id_trumny
+        WHERE material = 'dąb' and n.id is null
+        group by trumny.id, n.id
+        limit 1)
+    select id from pierwsza
 ) where imie='Marian Smoluchowski';
 
--- Dodanie Sierpińskiego do odpowiedniej krypty
-update trumny
-set id_krypty = 1
-where id=(
-    SELECT id_trumny
-    from nieboszczycy
-    where imie = 'Wacław Sierpiński'
-);
 
 -- Dodanie Infeldowi sosnowej trumny
 update nieboszczycy
 set id_trumny = (
-    with id_trumny as (
-    select * from trumny where material = 'sosna' and id_krypty is null and id_nagrobka is null limit 1
-) select id from id_trumny
+    with pierwsza as (
+        SELECT trumny.* from trumny left join nieboszczycy n on trumny.id = n.id_trumny
+        WHERE material = 'sosna' and n.id is null
+        group by trumny.id, n.id
+        limit 1)
+    select id from pierwsza
 ) where imie='Leopold Infeld';
 
 -- Dodanie Infelda do odpowiedniej krypty
@@ -485,10 +539,12 @@ where id=(
 -- Dodanie Steinhausowi sosnowej trumny
 update nieboszczycy
 set id_trumny = (
-    with id_trumny as (
-    select
-           * from trumny where material = 'olcha' and id_krypty is null and id_nagrobka is null limit 1
-) select id from id_trumny
+    with pierwsza as (
+        SELECT trumny.* from trumny left join nieboszczycy n on trumny.id = n.id_trumny
+        WHERE material = 'sosna' and n.id is null
+        group by trumny.id, n.id
+        limit 1)
+    select id from pierwsza
 ) where imie='Hugo Steinhaus';
 
 -- Dodanie Steinhausa do odpowiedniej krypty
@@ -500,16 +556,18 @@ where id=(
     where imie = 'Hugo Steinhaus'
 );
 
--- Dodanie Steinhausowi sosnowej trumny
+-- Dodanie Kuratowskiemu sosnowej trumny
 update nieboszczycy
 set id_trumny = (
-    with id_trumny as (
-    select
-           * from trumny where material = 'sosna' and id_krypty is null and id_nagrobka is null limit 1
-) select id from id_trumny
+    with pierwsza as (
+        SELECT trumny.* from trumny left join nieboszczycy n on trumny.id = n.id_trumny
+        WHERE material = 'sosna' and n.id is null
+        group by trumny.id, n.id
+        limit 1)
+    select id from pierwsza
 ) where imie='Kazimierz Kuratowski';
 
--- Dodanie Steinhausa do odpowiedniej krypty
+-- Dodanie Kuratowskiego do odpowiedniej krypty
 update trumny
 set id_krypty = 4
 where id=(
