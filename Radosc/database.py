@@ -236,3 +236,7 @@ def dodaj_trumne(material, id_kostnicy):
 def dodaj_urne(material, id_krematorium):
     return f"""INSERT INTO urny(material, id_krematorium)
             VALUES ('{material}', {id_krematorium})"""
+
+@postgres_send
+def dodaj_nagrobek(material):
+    return f"INSERT INTO nagrobki(material) VALUES ('{material}')"

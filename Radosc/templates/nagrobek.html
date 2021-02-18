@@ -19,7 +19,32 @@
 
 
 {% if current_user.is_authenticated %}
+<div class="content-section">
+  <form class="" action="" method="POST">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Dodaj nagrobek</legend>
+      <div class="form-group">
+          {{ form.material.label(class="form-control-label")}}
 
+          {% if form.material.errors %}
+            {{ form.material(class="form-control form-control-lg is-invalid")}}
+            <div class="invalid-feedback">
+                {% for error in form.material.errors %}
+                  <span>{{ error}}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+                {{ form.material(class="form-control form-control-lg", type="text")}}
+            {% endif %}
+      </div>
+
+  </fieldset>
+    <div class="form-group">
+        {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+  </form>
+  </div>
     <article class="media content-section custom-subtitle">
       <h2>Wolne nagrobki</h2>
     </article>

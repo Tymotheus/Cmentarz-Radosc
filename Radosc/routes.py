@@ -89,11 +89,17 @@ def krypta():
 def nagrobek():
     zajete_nagrobki = pobierz_zajete_nagrobki()
     nieprzypisane_nagrobki = pobierz_nieprzypisane_nagrobki()
+    form = DodajNagrobekForm()
     print("Zajęte nagrobki: ")
     print(zajete_nagrobki)
     print("Nieprzypisane nagrobki: ")
     print(nieprzypisane_nagrobki)
+    if form.validate_on_submit():
+        dodaj_nagrobek(form.material.data)
+        return redirect(url_for('nagrobek'))
+
     return render_template('nagrobek.html', title='Nagrobek', \
+        form=form,\
         zajete_nagrobki=zajete_nagrobki, nieprzypisane_nagrobki=nieprzypisane_nagrobki )
 
 @app.route('/kostnica/', methods=['GET', 'POST'])

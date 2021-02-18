@@ -258,7 +258,7 @@ set id_trumny = (
 
 -- Dodanie Kuratowskiego do odpowiedniej krypty
 update trumny
-set id_krypty = 4
+set id_krypty = 1
 where id=(
     SELECT id_trumny
     from nieboszczycy

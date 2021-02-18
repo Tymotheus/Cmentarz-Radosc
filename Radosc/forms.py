@@ -122,6 +122,13 @@ class DodajUrneForm(FlaskForm):
     id_krematorium = IntegerField('ID krematorium')
     submit = SubmitField('Dodaj Urnę')
 
+
+#nowy nagrobek
+class DodajNagrobekForm(FlaskForm):
+    material = StringField('Materiał')
+    submit = SubmitField('Dodaj Nagrobek')
+
+
 class LoginForm(FlaskForm):
     email = StringField('Email',
                 validators=[DataRequired(), Email()])
