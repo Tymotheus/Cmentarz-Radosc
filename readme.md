@@ -7,6 +7,10 @@
 * <b>Database:</b> PostgreSQL
 * <b>Python + Postgres connection:</b> psycopg2 package
 
+At the moment, app is available here:
+https://cmentarz-radosc.herokuapp.com/about
+
+
 <h3>Notes</h3>
 
 <b>Running app notes:</b>
