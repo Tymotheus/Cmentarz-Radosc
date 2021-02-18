@@ -9,6 +9,7 @@ def postgres_get(func):
         # print("Inside a decorator")
         # print("I will establish the connection now")
         try:
+            #change those values to your database's
             connection = psycopg2.connect(user="oxshwzrq",
                                           password="9ZKvgKkiRx4DeHNoawPToBdgpXl-DXtn",
                                           host="balarama.db.elephantsql.com",
@@ -36,6 +37,7 @@ def postgres_send(func):
         # print("Inside a decorator")
         # print("I will establish the connection now")
         try:
+            #change those values to your database's
             connection = psycopg2.connect(user="oxshwzrq",
                                           password="9ZKvgKkiRx4DeHNoawPToBdgpXl-DXtn",
                                           host="balarama.db.elephantsql.com",
