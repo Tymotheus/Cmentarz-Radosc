@@ -144,6 +144,47 @@
     </article>
     {% endfor %}
 
+    <div class="content-section">
+      <form class="" action="" method="POST">
+        {{ form_nowa_trumna.hidden_tag() }}
+        <fieldset class="form-group">
+          <legend class="border-bottom mb-4">Dodaj trumnę</legend>
+          <div class="form-group">
+              {{ form_nowa_trumna.material.label(class="form-control-label")}}
+
+              {% if form_nowa_trumna.material.errors %}
+                {{ form_nowa_trumna.material(class="form-control form-control-lg is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form_nowa_trumna.material.errors %}
+                      <span>{{ error}}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{ form_nowa_trumna.material(class="form-control form-control-lg", type="text")}}
+                {% endif %}
+          </div>
+
+          <div class="form-group">
+              {{ form_nowa_trumna.id_kostnicy.label(class="form-control-label")}}
+
+              {% if form_nowa_trumna.id_kostnicy.errors %}
+                {{ form_nowa_trumna.id_kostnicy(class="form-control form-control-lg is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form_nowa_trumna.id_kostnicy.errors %}
+                      <span>{{ error}}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{ form_nowa_trumna.id_kostnicy(class="form-control form-control-lg", type="number", value=1)}}
+                {% endif %}
+          </div>
+
+      </fieldset>
+        <div class="form-group">
+            {{ form_nowa_trumna.submit(class="btn btn-outline-info") }}
+        </div>
+      </form>
+      </div>
     <article class="media content-section custom-subtitle">
       <h2>Puste trumny</h2>
     </article>

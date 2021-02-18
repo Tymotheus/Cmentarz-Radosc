@@ -119,6 +119,18 @@ def pobierz_puste_trumny():
 def pobierz_puste_urny():
     return "SELECT * FROM puste_urny"
 
+@postgres_get
+def pobierz_trumniarzy():
+    return "SELECT * FROM trumniarze"
+
+@postgres_get
+def pobierz_urniarzy():
+    return "SELECT * FROM urniarze"
+
+@postgres_get
+def pobierz_sprzataczy():
+    return "SELECT * FROM sprzatacze"
+
 #wyszukuje konretnego nieboszczyka
 @postgres_get
 def wyszukaj_nieboszczyka(imie):
@@ -202,3 +214,25 @@ def przypisz_nieboszczyka_do_urny(id_nieboszczyka, id_urny):
                 SET id_urny = {id_urny}
                 WHERE nieboszczycy.id = ({id_nieboszczyka})
                 """
+
+@postgres_send
+def dodaj_trumniarza(imie):
+    return f"INSERT INTO trumniarze(imie) VALUES ('{imie}')"
+
+@postgres_send
+def dodaj_urniarza(imie):
+    return f"INSERT INTO urniarze(imie) VALUES ('{imie}')"
+
+@postgres_send
+def dodaj_sprzatacza(imie):
+    return f"INSERT INTO sprzatacze(imie) VALUES ('{imie}')"
+
+@postgres_send
+def dodaj_trumne(material, id_kostnicy):
+    return f"""INSERT INTO trumny(material, id_kostnicy)
+            VALUES ('{material}', {id_kostnicy})"""
+
+@postgres_send
+def dodaj_urne(material, id_krematorium):
+    return f"""INSERT INTO urny(material, id_krematorium)
+            VALUES ('{material}', {id_krematorium})"""

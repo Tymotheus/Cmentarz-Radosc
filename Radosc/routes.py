@@ -42,9 +42,7 @@ def nieboszczyk():
         print(wstaw_nieboszczyka(form.username.data, form.data_urodzenia.data, form.data_zgonu.data))
         print('**************************************************************')
         flash(f'Twoje zgłoszenie zostało odnotowane', 'success')
-        nieboszczycy = pobierz_nieboszczykow()
-        nieprzypisani_nieboszczycy = pobierz_nieprzypisanych_nieboszczykow()
-        sredni_wiek = round(pobierz_sredni_wiek()[0][0], 2)
+        return redirect(url_for('nieboszczyk'))
 
     #formularz do wyszukiwania nieboszczyków
     if wyszukaj_form.validate_on_submit():
@@ -82,12 +80,8 @@ def krypta():
         #print(f"Nazwa: {form.nazwa_krypty.data} Pojemnosc: {form.pojemnosc.data}")
         wstaw_krypte(form.nazwa_krypty.data, form.pojemnosc.data)
         flash(f'Krypta została dodana', 'success')
-        krypty = pobierz_krypty()
-        print("Przed referencją: " + str(krypty) )
-        mieszkancy_trumny = [ mieszkancy_krypty_trumny(krypta[1]) for krypta in krypty]
-        mieszkancy_urny= [ mieszkancy_krypty_urny(krypta[1]) for krypta in krypty]
-        krypty = list(zip(krypty,mieszkancy_trumny,mieszkancy_urny))
-        print("Zmienna krypty: " + str(krypty) )
+        return redirect(url_for('krypta'))
+
     return render_template('krypta.html', title="Krypta", form=form, \
             krypty=krypty)
 
@@ -111,7 +105,8 @@ def kostnica():
     if form.validate_on_submit():
         wstaw_kostnice(form.nazwa_kostnicy.data)
         flash(f'Kostnica została (prawie) dodana', 'success')
-        kostnice = pobierz_kostnice()
+        return redirect(url_for('kostnica'))
+
     return render_template('kostnica.html', title="Kostnica", form=form, kostnice=kostnice)
 
 
@@ -123,7 +118,7 @@ def krematorium():
     if form.validate_on_submit():
         wstaw_krematorium(form.nazwa_krematorium.data)
         flash(f'Krematorium zostało (prawie) dodane', 'success')
-        krematoria = pobierz_krematoria()
+        return redirect(url_for('krematorium'))
     return render_template('krematorium.html', title="Krematorium", form=form, krematoria=krematoria)
 
 @app.route('/trumna/', methods=['GET', 'POST'])
@@ -137,26 +132,25 @@ def trumna():
     form_krypta = PrzypiszTrumneKrypcieForm()
     form_nagrobek = PrzypiszTrumneNagrobkowiForm()
     form_nieboszczyk = PrzypiszTrumneNieboszczykowiForm()
+    form_nowa_trumna = DodajTrumneForm()
     if form_nieboszczyk.validate_on_submit():
         przypisz_nieboszczyka_do_trumny(form_nieboszczyk.id_nieboszczyka.data, form_nieboszczyk.id_trumny.data )
         flash(f'Trumna została (chyba? Może?) dodana do nieboszczyka', 'success')
-        trumny = pobierz_nieprzypisane_trumny()
-        print(trumny)
-        puste_trumny = pobierz_puste_trumny()
+        return redirect(url_for('trumna'))
     elif form_krypta.validate_on_submit():
         przypisz_trumnie_krypte(form_krypta.id_trumny.data, form_krypta.id_krypty.data )
         flash(f'Trumna została (chyba? Może?) dodana do krypty', 'success')
-        trumny = pobierz_nieprzypisane_trumny()
-        print(trumny)
-        puste_trumny = pobierz_puste_trumny()
+        return redirect(url_for('trumna'))
     elif form_nagrobek.validate_on_submit():
         przypisz_trumnie_nagrobek(form_nagrobek.id_trumny.data, form_nagrobek.id_nagrobka.data )
         flash(f'Trumna została (chyba? Może?) dodana do nagrobka', 'success')
-        trumny = pobierz_nieprzypisane_trumny()
-        print(trumny)
-        puste_trumny = pobierz_puste_trumny()
+        return redirect(url_for('trumna'))
+    elif form_nowa_trumna.validate_on_submit():
+        dodaj_trumne(form_nowa_trumna.material.data, form_nowa_trumna.id_kostnicy.data)
+        return redirect(url_for('trumna'))
     return render_template('trumna.html', title="Trumny", form_krypta=form_krypta,\
      form_nagrobek =form_nagrobek, form_nieboszczyk=form_nieboszczyk, \
+     form_nowa_trumna=form_nowa_trumna,
      trumny=trumny, puste_trumny=puste_trumny)
 
 @app.route('/urna/', methods=['GET', 'POST'])
@@ -169,25 +163,47 @@ def urna():
     print(puste_urny)
     form_krypta = PrzypiszUrneKrypcieForm()
     form_nieboszczyk = PrzypiszUrneNieboszczykowiForm()
+    form_nowa_urna = DodajUrneForm()
     if form_krypta.validate_on_submit():
         przypisz_urnie_krypte(form_krypta.id_urny.data, form_krypta.id_krypty.data )
         flash(f'Urna została (chyba? Może?) dodana do krypty', 'success')
-        urny = pobierz_nieprzypisane_urny()
-        print(urny)
-        puste_urny = pobierz_puste_urny()
-        print(puste_urny)
+        return redirect(url_for('urna'))
+
     if form_nieboszczyk.validate_on_submit():
         przypisz_nieboszczyka_do_urny(form_nieboszczyk.id_nieboszczyka.data, form_nieboszczyk.id_urny.data )
         flash(f'Urna została (chyba? Może?) dodana do nieboszczyka', 'success')
-        urny = pobierz_nieprzypisane_urny()
-        print(urny)
-        puste_urny = pobierz_puste_urny()
-        print(puste_urny)
+        return redirect(url_for('urna'))
 
+    if form_nowa_urna.validate_on_submit():
+        dodaj_urne(form_nowa_urna.material.data, form_nowa_urna.id_krematorium.data)
+        return redirect(url_for('urna'))
     return render_template('urna.html', title="Urny", form_krypta=form_krypta,\
-    form_nieboszczyk=form_nieboszczyk, urny=urny, puste_urny=puste_urny)
+    form_nieboszczyk=form_nieboszczyk, urny=urny, puste_urny=puste_urny,
+    form_nowa_urna=form_nowa_urna)
 
-
+@app.route('/pracownik/', methods=['GET', 'POST'])
+@login_required
+def pracownik():
+    trumniarze = pobierz_trumniarzy()
+    urniarze = pobierz_urniarzy()
+    sprzatacze = pobierz_sprzataczy()
+    trumniarz_form = DodajTrumniarzaForm()
+    urniarz_form = DodajUrniarzaForm()
+    sprzatacz_form = DodajSprzataczaForm()
+    print(trumniarze)
+    if trumniarz_form.validate_on_submit():
+        dodaj_trumniarza(trumniarz_form.imie_trumniarza.data)
+        return redirect(url_for('pracownik'))
+    if urniarz_form.validate_on_submit():
+        dodaj_urniarza(urniarz_form.imie_urniarza.data)
+        return redirect(url_for('pracownik'))
+    if sprzatacz_form.validate_on_submit():
+        dodaj_sprzatacza(sprzatacz_form.imie_sprzatacza.data)
+        return redirect(url_for('pracownik'))
+    return render_template('pracownik.html', title='Pracownik',\
+    trumniarz_form=trumniarz_form, urniarz_form=urniarz_form, \
+    sprzatacz_form=sprzatacz_form, trumniarze = trumniarze, \
+    urniarze=urniarze, sprzatacze=sprzatacze)
 
 
 @app.route("/register/", methods=['GET', 'POST'])

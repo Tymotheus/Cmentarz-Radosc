@@ -1,0 +1,143 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="content-section">
+
+  <form class="" action="" method="POST">
+    {{ trumniarz_form.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Podaj imię nowego trumniarza</legend>
+      <div class="form-group">
+          {{ trumniarz_form.imie_trumniarza.label(class="form-control-label")}}
+
+          {% if trumniarz_form.imie_trumniarza.errors %}
+            {{ trumniarz_form.imie_trumniarza(class="form-control form-control-lg is-invalid")}}
+            <div class="invalid-feedback">
+                {% for error in trumniarz_form.imie_trumniarza.errors %}
+                  <span>{{ error}}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+                {{ trumniarz_form.imie_trumniarza(class="form-control form-control-lg")}}
+            {% endif %}
+      </div>
+
+  </fieldset>
+  <div class="form-group">
+      {{ trumniarz_form.submit(class="btn btn-outline-info") }}
+  </div>
+  </form>
+
+</div>
+
+<div class="content-section">
+
+  <form class="" action="" method="POST">
+    {{ urniarz_form.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Podaj imię nowego urniarza</legend>
+      <div class="form-group">
+          {{ urniarz_form.imie_urniarza.label(class="form-control-label")}}
+
+          {% if urniarz_form.imie_urniarza.errors %}
+            {{ urniarz_form.imie_urniarza(class="form-control form-control-lg is-invalid")}}
+            <div class="invalid-feedback">
+                {% for error in urniarz_form.imie_urniarza.errors %}
+                  <span>{{ error}}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+                {{ urniarz_form.imie_urniarza(class="form-control form-control-lg")}}
+            {% endif %}
+      </div>
+
+  </fieldset>
+  <div class="form-group">
+      {{ urniarz_form.submit(class="btn btn-outline-info") }}
+  </div>
+  </form>
+
+</div>
+
+<div class="content-section">
+
+  <form class="" action="" method="POST">
+    {{ sprzatacz_form.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Podaj imię nowego sprzątacza</legend>
+      <div class="form-group">
+          {{ sprzatacz_form.imie_sprzatacza.label(class="form-control-label")}}
+
+          {% if sprzatacz_form.imie_sprzatacza.errors %}
+            {{ sprzatacz_form.imie_sprzatacza(class="form-control form-control-lg is-invalid")}}
+            <div class="invalid-feedback">
+                {% for error in sprzatacz_form.imie_sprzatacza.errors %}
+                  <span>{{ error}}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+                {{ sprzatacz_form.imie_sprzatacza(class="form-control form-control-lg")}}
+            {% endif %}
+      </div>
+
+  </fieldset>
+  <div class="form-group">
+      {{ sprzatacz_form.submit(class="btn btn-outline-info") }}
+  </div>
+  </form>
+
+</div>
+
+
+<article class="media content-section custom-subtitle">
+  <h2 class="article-title"> Trumniarze</h2>
+</article>
+
+  {% for trumniarz in trumniarze %}
+  <article class="media content-section">
+    <div class="media-body">
+      <div class="article-metadata">
+        <small class="text-muted">ID {{ trumniarz[0] }}</small>
+      </div>
+      <h2><a class="article-title" href="#">{{ trumniarz[1] }}</a></h2>
+
+    </div>
+  </article>
+  {% endfor %}
+
+  <br> <br>
+  <article class="media content-section custom-subtitle">
+    <h2 class="article-title"> Urniarze</h2>
+  </article>
+
+  {% for urniarz in urniarze %}
+  <article class="media content-section">
+    <div class="media-body">
+      <div class="article-metadata">
+        <small class="text-muted">ID {{ urniarz[0] }}</small>
+      </div>
+      <h2><a class="article-title" href="#">{{ urniarz[1] }}</a></h2>
+
+    </div>
+  </article>
+  {% endfor %}
+
+  <br> <br>
+  <article class="media content-section custom-subtitle">
+    <h2 class="article-title"> Sprzątacze</h2>
+  </article>
+
+  {% for sprzatacz in sprzatacze %}
+  <article class="media content-section">
+    <div class="media-body">
+      <div class="article-metadata">
+        <small class="text-muted">ID {{ sprzatacz[0] }}</small>
+      </div>
+      <h2><a class="article-title" href="#">{{ sprzatacz[1] }}</a></h2>
+
+    </div>
+  </article>
+  {% endfor %}
+
+{% endblock content %}

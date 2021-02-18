@@ -269,3 +269,9 @@ where id=(
 UPDATE nieboszczycy
 SET id_urny=2
 WHERE imie = 'Aleksander Wolszczan';
+
+INSERT into trumniarze(imie) VALUES
+('Jan z Kolna');
+
+INSERT into trumny(material, id_kostnicy) VALUES
+('olcha', 1);

@@ -90,11 +90,37 @@ class PrzypiszUrneNieboszczykowiForm(FlaskForm):
 
 #wyszukiwanie nieboszczyków
 class WyszukajNieboszczykaForm(FlaskForm):
-    imie = StringField('Imię nieboszczyka', validators=[DataRequired()])
+    imie = StringField('Imię i nazwisko nieboszczyka', validators=[DataRequired()])
     submit = SubmitField('Wyszukaj nieboszczyka')
     trumna = BooleanField('Trumna')
     urna = BooleanField('Urna')
 
+#dodaj trumniarza
+class DodajTrumniarzaForm(FlaskForm):
+    imie_trumniarza = StringField('Imię i nazwisko trumniarza')
+    submit = SubmitField('Dodaj Trumniarza')
+
+#dodaj urniarza
+class DodajUrniarzaForm(FlaskForm):
+    imie_urniarza = StringField('Imię i nazwisko urniarza')
+    submit = SubmitField('Dodaj Urniarza')
+
+#dodaj sprzątacza
+class DodajSprzataczaForm(FlaskForm):
+    imie_sprzatacza = StringField('Imię i nazwisko sprzątacza')
+    submit = SubmitField('Dodaj Sprzątacza')
+
+#nowa trumna
+class DodajTrumneForm(FlaskForm):
+    material = StringField('Materiał')
+    id_kostnicy = IntegerField('ID Kostnicy')
+    submit = SubmitField('Dodaj Trumnę')
+
+#nowa urna
+class DodajUrneForm(FlaskForm):
+    material = StringField('Materiał')
+    id_krematorium = IntegerField('ID krematorium')
+    submit = SubmitField('Dodaj Urnę')
 
 class LoginForm(FlaskForm):
     email = StringField('Email',
