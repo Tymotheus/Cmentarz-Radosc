@@ -2,10 +2,10 @@
 
 -- Dodawanie krypt
 insert into krypty (nazwa, pojemnosc, wybudowano) VALUES
-('Krypta Odrodzenia', 4, '15.04.1452'),
-('Krypta św. Leonarda', 10, '25.12.1117'),
-('Krypta 101', 13, '14.09.2011'),
-('Krypta Norymberska', 2, '2.08.1928');
+('Krypta Odrodzenia', 4, '1452-04-15'),
+('Krypta św. Leonarda', 10, '1117-12-25'),
+('Krypta 101', 13, '2011-09-14'),
+('Krypta Norymberska', 2, '1928-08-02');
 
 -- Dodawanie kostnic
 INSERT INTO kostnice (nazwa) VALUES
@@ -53,19 +53,20 @@ INSERT INTO nagrobki (material) VALUES
 ('piaskowiec'),
 ('granit');
 
+
 -- Dodawanie nieboszczyków
 INSERT INTO nieboszczycy (imie, data_urodzenia, data_zgonu) VALUES
-( 'Stefan Banach', '30.04.1892', '31.08.1945'),
-( 'Hugo Steinhaus', '14.01.1887', '25.02.1972'),
-( 'Stanisław Ulam', '3.04.1909', '13.05.1984'),
-( 'Kazimierz Kuratowski', '2.02.1896', '18.06.1980'),
-( 'Wacław Sierpiński', '14.03.1882', '21.10.1969') ,
-( 'Marian Smoluchowski', '28.05.1872', '5.09.1917'),
-( 'Leopold Infeld', '20.08.1898', '15.01.1968'),
-( 'Aleksander Wolszczan', '29.04.1946', '10.11.2036'),
-( 'Karol Borsuk', '8.05.1905', '24.01.1982'),
-( 'Stanisław Mazur', '1.01.1905', '5.11.1981'),
-( 'Marian Rejewski', '16.08.1905', '13.02.1980');
+( 'Stefan Banach', '1892-04-30', '1945.08.31'),
+( 'Hugo Steinhaus', '1887-01-14', '1972-02-25'),
+( 'Stanisław Ulam', '3-04-1909', '1984-05-13'),
+( 'Kazimierz Kuratowski', '1896.2.02', '1980.06.18'),
+( 'Wacław Sierpiński', '1882.03.14', '1969.10.21') ,
+( 'Marian Smoluchowski', '1872.05.28', '1917.09.5'),
+( 'Leopold Infeld', '1898.08.20', '1968.01.15'),
+( 'Aleksander Wolszczan', '1946.04.29', '2036.11.10'),
+( 'Karol Borsuk', '1905.05.08', '1982.01.24'),
+( 'Stanisław Mazur', '1905.01.01', '1981.11.5'),
+( 'Marian Rejewski', '1905.08.16', '1980.02.13');
 
 -- Dodawanie trumniarzy
 INSERT INTO trumniarze (imie) VALUES

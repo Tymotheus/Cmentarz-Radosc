@@ -27,6 +27,12 @@ python app.py
 the requirements of the project for the roles.
 * Another requirement was to make the app and all its functions in Polish language - I might rewrite it to English one day.
 
+<b>Note 18.02.2021:</b>
+<b>Note concerning the deploy</b>
+I was deploying the base to ElephantSQL. I came across the following problem:
+I had to rewrite inserts, more precisely the date to other format:
+FROM '30.04.1892' TO '1892-04-30'
+
 <b>Note 17.02.2021:</b>
 Added a lot. Pretty much. Additional tables and triggers and backend validation.
 
